@@ -36,6 +36,8 @@ import ViewProfilePage from "./pages/ViewProfilePage";
 import CreateUsersPage from "./pages/CreateUsersPage";
 import NewChargingPage from "./pages/NewChargingPage";
 import ReportProductsPage from "./pages/ReportProducts";
+import ListReturnSalesStatus from "./pages/ListReturnSalesStatus";
+import CreateSaleReturn from "./pages/CreateSaleReturn";
 
 function App() {
   const activeLayout = useAppSelector((state) => state.layout.isLayout);
@@ -93,6 +95,8 @@ function App() {
                 <Route path="/report-products" element={<ReportProductsPage />} />
                 <Route path="/collector-cities" element={<AddCitiesByCollectorPage />} />
                 <Route path="/collector-sales" element={<ListCollectorSalesPage />} />
+                <Route path="/list-sales-return" element={<ListReturnSalesStatus />} />
+                <Route path="/create-sale-return" element={<CreateSaleReturn/>} />
               </Route>
             </Route>
           </Route>

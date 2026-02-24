@@ -549,6 +549,26 @@ const navData = [
           },
         ],
       },
+      {
+        title: "Pós-Venda",
+        hasSub: true,
+        icon: "ti ti-checkup-list",
+        url: "#",
+        subLinks: [
+          {
+            subTitle: "Consultar Ocorrências",
+            subUrl: "/list-sales-return",
+          },
+          {
+            subTitle: "Registrar Ocorrência ",
+            subUrl: "/create-sale-return",
+          },
+          {
+            subTitle: "Alterar Status ",
+            subUrl: "/collector-cities",
+          },
+        ],
+      },
     ],
   },
   {

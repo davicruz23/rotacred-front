@@ -58,6 +58,11 @@ type CollectorType = {
   sales: SaleType[];
 };
 
+type CollectorSimpleType = {
+  id: number;
+  collectorName: string;
+};
+
 enum SaleStatusFilter {
   TODOS = 0,
   ATIVOS = 1,
@@ -67,14 +72,37 @@ enum SaleStatusFilter {
 
 const ListCollectorSalesPage = () => {
   const [collectorData, setCollectorData] = useState<CollectorType[]>([]);
+  const [collectors, setCollectors] = useState<CollectorSimpleType[]>([]);
   const [statusFilter, setStatusFilter] = useState<number>(0);
+  const [collectorFilter, setCollectorFilter] = useState<number | null>(null);
 
-  const fetchCollectorsWithSales = async (status?: number) => {
+  const fetchCollectors = async () => {
+    try {
+      const response = await api.get("/collector/name/all");
+      setCollectors(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar cobradores:", error);
+    }
+  };
+
+  const fetchCollectorsWithSales = async (
+    status?: number,
+    collectorId?: number | null
+  ) => {
     try {
       let url = "/collector/all/sales";
+      const params: string[] = [];
 
       if (status && status !== 0) {
-        url += `?status=${status}`;
+        params.push(`status=${status}`);
+      }
+
+      if (collectorId) {
+        params.push(`collectorId=${collectorId}`);
+      }
+
+      if (params.length > 0) {
+        url += `?${params.join("&")}`;
       }
 
       const response = await api.get(url);
@@ -86,19 +114,28 @@ const ListCollectorSalesPage = () => {
   };
 
   useEffect(() => {
-    fetchCollectorsWithSales(statusFilter);
-  }, [statusFilter]);
+    fetchCollectors();
+  }, []);
+
+  useEffect(() => {
+    fetchCollectorsWithSales(statusFilter, collectorFilter);
+  }, [statusFilter, collectorFilter]);
 
   return (
     <div className="container-fluid px-1 my-1">
-      <BreadcrumbSection title="Lista de venda para cobrança" link="/inicio" />
+      <BreadcrumbSection
+        title="Lista de venda para cobrança"
+        link="/inicio"
+      />
 
       <div className="card p-4 shadow-sm">
         <h3 className="mb-4">Lista de cobranças</h3>
 
         <div className="row mb-3">
           <div className="col-md-4">
-            <label className="form-label fw-semibold">Filtrar por status</label>
+            <label className="form-label fw-semibold">
+              Filtrar por status
+            </label>
             <select
               className="form-select"
               value={statusFilter}
@@ -107,7 +144,31 @@ const ListCollectorSalesPage = () => {
               <option value={SaleStatusFilter.TODOS}>TODOS</option>
               <option value={SaleStatusFilter.ATIVOS}>ATIVOS</option>
               <option value={SaleStatusFilter.REAVIDO}>RECUPERADOS</option>
-              <option value={SaleStatusFilter.DESISTENCIA}>DESISTÊNCIAS</option>
+              <option value={SaleStatusFilter.DESISTENCIA}>
+                DESISTÊNCIAS
+              </option>
+            </select>
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label fw-semibold">
+              Filtrar por cobrador
+            </label>
+            <select
+              className="form-select"
+              value={collectorFilter ?? ""}
+              onChange={(e) =>
+                setCollectorFilter(
+                  e.target.value ? Number(e.target.value) : null
+                )
+              }
+            >
+              <option value="">TODOS</option>
+              {collectors.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.collectorName.toUpperCase()}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -127,10 +188,10 @@ const ListCollectorSalesPage = () => {
                   aria-expanded="false"
                   aria-controls={`coll-${collector.id}`}
                 >
-                  {collector.collectorName} ({collector.sales.length} Cobranças)
+                  {collector.collectorName} (
+                  {collector.sales.length} Cobranças)
                 </button>
               </h2>
-
               <div
                 id={`coll-${collector.id}`}
                 className="accordion-collapse collapse"
