@@ -2,6 +2,20 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import BreadcrumbSection from "../components/breadcrumb/BreadcrumbSection";
 
+type SaleReturnType = {
+  saleReturnId: number;
+  returnDate: string;
+  saleStatus: number;
+  productIdReturned: number;
+  productNameReturned: string;
+  quantityReturned: number;
+  description: string;
+  saleDTO: {
+    saleDate: string;
+    clientName: string;
+  };
+};
+
 type SaleSearchType = {
   saleId: number;
   saleDate: string;
@@ -30,15 +44,19 @@ enum ReturnStatus {
   DANIFICADO = 6,
 }
 
-const CreateSaleReturn = () => {
+const UpdateSaleReturn = () => {
   const [searchName, setSearchName] = useState("");
   const [searchId, setSearchId] = useState("");
-  const [sales, setSales] = useState<SaleSearchType[]>([]);
+  //const [sales, setSales] = useState<SaleSearchType[]>([]);
   const [selectedSale, setSelectedSale] = useState<SaleDetailType | null>(null);
   const [status, setStatus] = useState<number | "">("");
   const [description, setDescription] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
   const [searchCity, setSearchCity] = useState("");
+  const [sales, setSales] = useState<SaleReturnType[]>([]);
+  const [pendingStatus, setPendingStatus] = useState<{
+    [key: number]: number;
+  }>({});
 
   const [items, setItems] = useState<
     { productId: number; quantityReturned: number }[]
@@ -46,18 +64,49 @@ const CreateSaleReturn = () => {
 
   const searchSales = async () => {
     try {
-      const response = await api.get("sale/sales/search", {
-        params: {
-          id: searchId ? Number(searchId) : undefined,
-          name: searchName || undefined,
-          cpf: searchCpf || undefined,
-          city: searchCity || undefined,
-        },
+      const response = await api.get("/sale-return/status/end", {
+        // params: {
+        //   id: searchId ? Number(searchId) : undefined,
+        //   name: searchName || undefined,
+        //   cpf: searchCpf || undefined,
+        //   city: searchCity || undefined,
+        // },
       });
 
       setSales(response.data);
     } catch (error) {
       console.error("Erro ao buscar vendas:", error);
+    }
+  };
+
+  const handleStatusChange = async (
+    saleReturnId: number,
+    newStatus: number
+  ) => {
+    try {
+      await api.patch(
+        `/sale-return/${saleReturnId}/update/status`,
+        {
+          status: newStatus,
+        }
+      );
+
+      setSales((prev) =>
+        prev.map((sale) =>
+          sale.saleReturnId === saleReturnId
+            ? { ...sale, saleStatus: newStatus }
+            : sale
+        )
+      );
+
+      setPendingStatus((prev) => {
+        const updated = { ...prev };
+        delete updated[saleReturnId];
+        return updated;
+      });
+
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
     }
   };
 
@@ -194,26 +243,52 @@ const CreateSaleReturn = () => {
                 <tr>
                   <th>ID</th>
                   <th>Cliente</th>
-                  <th>CPF</th>
+                  <th>Qtd</th>
                   <th>Data</th>
-                  <th>Cidade</th>
+                  <th>Produto</th>
                   <th className="text-end"></th>
                 </tr>
               </thead>
               <tbody>
                 {sales.map((sale) => (
-                  <tr key={sale.saleId}>
-                    <td>{sale.saleId}</td>
-                    <td>{sale.clientName}</td>
-                    <td>{sale.cpf}</td>
-                    <td>{sale.saleDate}</td>
-                    <td>{sale.city}</td>
+                  <tr key={sale.saleReturnId}>
+                    <td>{sale.saleReturnId}</td>
+                    <td>{sale.saleDTO.clientName}</td>
+                    <td>{sale.quantityReturned}</td>
+                    <td>{sale.returnDate}</td>
+                    <td>{sale.productNameReturned}</td>
                     <td className="text-end">
-                      <button
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={() => loadSaleDetail(sale.saleId)}
+                      <select
+                        className="form-select form-select-sm"
+                        value={
+                          pendingStatus[sale.saleReturnId] ?? sale.saleStatus
+                        }
+                        onChange={(e) =>
+                          setPendingStatus((prev) => ({
+                            ...prev,
+                            [sale.saleReturnId]: Number(e.target.value),
+                          }))
+                        }
                       >
-                        Selecionar
+                        {Object.entries(ReturnStatus)
+                          .filter(([key]) => isNaN(Number(key)))
+                          .map(([key, value]) => (
+                            <option key={value} value={value}>
+                              {key.replace("_", " ")}
+                            </option>
+                          ))}
+                      </select>
+                      <button
+                        className="btn btn-sm btn-success ms-2"
+                        disabled={!pendingStatus[sale.saleReturnId]}
+                        onClick={() =>
+                          handleStatusChange(
+                            sale.saleReturnId,
+                            pendingStatus[sale.saleReturnId]
+                          )
+                        }
+                      >
+                        Atualizar
                       </button>
                     </td>
                   </tr>
@@ -332,4 +407,4 @@ const CreateSaleReturn = () => {
   );
 };
 
-export default CreateSaleReturn;
+export default UpdateSaleReturn;

@@ -38,6 +38,7 @@ import NewChargingPage from "./pages/NewChargingPage";
 import ReportProductsPage from "./pages/ReportProducts";
 import ListReturnSalesStatus from "./pages/ListReturnSalesStatus";
 import CreateSaleReturn from "./pages/CreateSaleReturn";
+import UpdateSaleReturn from "./pages/UpdateSaleReturn";
 
 function App() {
   const activeLayout = useAppSelector((state) => state.layout.isLayout);
@@ -97,6 +98,7 @@ function App() {
                 <Route path="/collector-sales" element={<ListCollectorSalesPage />} />
                 <Route path="/list-sales-return" element={<ListReturnSalesStatus />} />
                 <Route path="/create-sale-return" element={<CreateSaleReturn/>} />
+                <Route path="/update-sale-status" element={<UpdateSaleReturn/>} />
               </Route>
             </Route>
           </Route>

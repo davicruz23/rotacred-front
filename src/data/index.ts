@@ -565,7 +565,7 @@ const navData = [
           },
           {
             subTitle: "Alterar Status ",
-            subUrl: "/collector-cities",
+            subUrl: "/update-sale-status",
           },
         ],
       },
