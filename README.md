@@ -54,6 +54,7 @@ yarn
 npm run dev
 # ou
 yarn dev
+````
 
 ## 👨‍💻 Autor
 
