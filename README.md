@@ -54,3 +54,11 @@ yarn
 npm run dev
 # ou
 yarn dev
+
+## 👨‍💻 Autor
+
+**Davi Cruz**  
+Desenvolvedor Back-End Java  
+
+GitHub: https://github.com/davicruz23  
+Email: davifieledeus@gmail.com
