@@ -18,12 +18,14 @@ type SaleReturnType = {
 
 enum ReturnStatusFilter {
   TODOS = 0,
+  DEFEITO_PRODUTO = 2,
   DESISTENCIA = 4,
   REAVIDO = 5,
   DANIFICADO = 6,
 }
 
 const statusMap: Record<number, string> = {
+  2: "GARANTIA",
   4: "DESISTÊNCIA",
   5: "RECUPERADO",
   6: "DANIFICADO",
@@ -85,6 +87,9 @@ const ListReturnSalesStatus = () => {
               onChange={(e) => setStatusFilter(Number(e.target.value))}
             >
               <option value={ReturnStatusFilter.TODOS}>TODOS</option>
+              <option value={ReturnStatusFilter.DEFEITO_PRODUTO}>
+                GARANTIA
+              </option>
               <option value={ReturnStatusFilter.DESISTENCIA}>
                 DESISTÊNCIA
               </option>
