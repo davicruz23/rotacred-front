@@ -1,16 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
 
-// ✅ Função para verificar se token expirou
 const isTokenExpired = (token: string): boolean => {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.exp * 1000 < Date.now(); // Verifica se expirou
+    return payload.exp * 1000 < Date.now();
   } catch {
-    return true; // Se der erro, considera expirado
+    return true;
   }
 };
 
-// ✅ Verifica apenas autenticação
 const PrivateRoute = () => {
   const token = localStorage.getItem("token");
 
@@ -18,17 +16,16 @@ const PrivateRoute = () => {
     token !== "undefined" &&
     token !== "null" &&
     token !== "" &&
-    !isTokenExpired(token); // ← AGORA VERIFICA EXPIRAÇÃO
+    !isTokenExpired(token);
 
   if (!isValidToken) {
-    localStorage.removeItem("token"); // Remove token inválido
+    localStorage.removeItem("token");
     return <Navigate to="/login" replace />;
   }
 
   return <Outlet />;
 };
 
-// ✅ Verifica autenticação + role específica
 const RoleRoute = ({ roles }: { roles: string[] }) => {
   const token = localStorage.getItem("token");
 
@@ -36,10 +33,10 @@ const RoleRoute = ({ roles }: { roles: string[] }) => {
     token !== "undefined" &&
     token !== "null" &&
     token !== "" &&
-    !isTokenExpired(token); // ← AGORA VERIFICA EXPIRAÇÃO
+    !isTokenExpired(token);
 
   if (!isValidToken) {
-    localStorage.removeItem("token"); // Remove token inválido
+    localStorage.removeItem("token");
     return <Navigate to="/login" replace />;
   }
 
