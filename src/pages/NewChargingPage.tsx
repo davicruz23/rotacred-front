@@ -295,8 +295,8 @@ const NewChargingPage = () => {
                             <thead>
                               <tr>
                                 <th>ID</th>
-                                <th>Nome</th>
-                                <th>Em Estoque</th>
+                                <th>NOME</th>
+                                <th>EM ESTOQUE</th>
                                 <th>Preço</th>
                                 <th>Status</th>
                               </tr>

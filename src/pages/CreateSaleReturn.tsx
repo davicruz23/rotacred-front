@@ -141,7 +141,7 @@ const CreateSaleReturn = () => {
 
           <div className="row g-3">
             <div className="col-md-3">
-              <label className="form-label text-muted small">ID da Venda</label>
+              <label className="form-label text-muted small">N° Venda</label>
               <input
                 type="number"
                 className="form-control"

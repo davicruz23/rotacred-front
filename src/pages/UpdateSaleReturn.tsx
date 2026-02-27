@@ -84,14 +84,14 @@ const UpdateSaleReturn = () => {
 
   return (
     <div className="container-fluid px-1 my-1">
-      <BreadcrumbSection title="Atualizar Devoluções" link="/inicio" />
+      <BreadcrumbSection title="Atualizar Status de Produtos em Garantia" link="/inicio" />
 
       {/* 🔎 FILTROS */}
       <div className="card border-0 shadow-sm mb-4">
         <div className="card-body">
           <div className="row g-3">
             <div className="col-md-3">
-              <label className="form-label small">ID</label>
+              <label className="form-label small">N° VENDA</label>
               <input
                 type="number"
                 className="form-control"
@@ -101,7 +101,7 @@ const UpdateSaleReturn = () => {
             </div>
 
             <div className="col-md-3">
-              <label className="form-label small">Cliente</label>
+              <label className="form-label small">NOME DO CLIENTE</label>
               <input
                 type="text"
                 className="form-control"
@@ -138,7 +138,7 @@ const UpdateSaleReturn = () => {
             <table className="table table-hover mb-0">
               <thead className="table-light">
                 <tr>
-                  <th>ID</th>
+                  <th>N° VENDA</th>
                   <th>Cliente</th>
                   <th>Produto</th>
                   <th>Qtd</th>

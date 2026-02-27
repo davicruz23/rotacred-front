@@ -560,12 +560,12 @@ const navData = [
             subUrl: "/list-sales-return",
           },
           {
-            subTitle: "Registrar Ocorrência ",
-            subUrl: "/create-sale-return",
+            subTitle: "Alterar Status da Venda ",
+            subUrl: "/update-sale-status",
           },
           {
-            subTitle: "Alterar Status ",
-            subUrl: "/update-sale-status",
+            subTitle: "Registrar Ocorrência ",
+            subUrl: "/create-sale-return",
           },
         ],
       },

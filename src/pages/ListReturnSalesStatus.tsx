@@ -11,6 +11,7 @@ type SaleReturnType = {
   quantityReturned: number;
   description: string;
   saleDTO: {
+    saleId: number;
     saleDate: string;
     clientName: string;
   };
@@ -107,6 +108,7 @@ const ListReturnSalesStatus = () => {
           <table className="table table-hover table-bordered align-middle">
             <thead className="table-light">
               <tr>
+                <th>N° VENDA</th>
                 <th>Cliente</th>
                 <th>Produto</th>
                 <th>Qtd</th>
@@ -120,13 +122,14 @@ const ListReturnSalesStatus = () => {
               {returns.length === 0 && (
                 <tr>
                   <td colSpan={7} className="text-center text-muted">
-                    Nenhuma devolução encontrada.
+                    Nenhuma Venda encontrada.
                   </td>
                 </tr>
               )}
 
               {returns.map((r) => (
                 <tr key={r.saleReturnId}>
+                  <td>{r.saleDTO.saleId}</td>
                   <td>{r.saleDTO.clientName}</td>
                   <td>{r.productNameReturned}</td>
                   <td>{r.quantityReturned}</td>
