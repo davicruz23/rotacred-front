@@ -20,13 +20,15 @@ type SaleReturnType = {
 enum ReturnStatusFilter {
   TODOS = 0,
   DEFEITO_PRODUTO = 2,
+
   DESISTENCIA = 4,
   REAVIDO = 5,
   DANIFICADO = 6,
 }
 
 const statusMap: Record<number, string> = {
-  2: "GARANTIA",
+  2: "NA GARANTIA",
+  3: "DEVOLVIDO",
   4: "DESISTÊNCIA",
   5: "RECUPERADO",
   6: "DANIFICADO",
@@ -40,47 +42,55 @@ const statusColor: Record<number, string> = {
 
 const ListReturnSalesStatus = () => {
   const [returns, setReturns] = useState<SaleReturnType[]>([]);
+  const [page, setPage] = useState(0);
+  const [size] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
   const [statusFilter, setStatusFilter] = useState<number>(0);
+  const [searchName, setSearchName] = useState("");
+  const [searchCpf, setSearchCpf] = useState("");
 
-  const fetchReturns = async (status?: number) => {
+  const fetchReturns = async (
+    status?: number,
+    pageNumber = 0
+  ) => {
     try {
-      let url = "sale-return/sale-returns";
+      const response = await api.get("sale-return/sale-returns", {
+        params: {
+          status: status !== 0 ? status : undefined,
+          name: searchName || undefined,
+          cpf: searchCpf || undefined,
+          page: pageNumber,
+          size: size,
+        },
+      });
 
-      const params: string[] = [];
-
-      if (status && status !== 0) { 
-        params.push(`status=${status}`);
-      }
-
-      if (params.length > 0) {
-        url += `?${params.join("&")}`;
-      }
-
-      const response = await api.get(url);
-      setReturns(response.data);
+      setReturns(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setPage(response.data.number);
     } catch (error) {
       console.error("Erro ao buscar devoluções:", error);
     }
   };
 
   useEffect(() => {
-    fetchReturns(statusFilter);
+    fetchReturns(statusFilter, 0);
   }, [statusFilter]);
 
   return (
     <div className="container-fluid px-1 my-1">
       <BreadcrumbSection
-        title="Devoluções de Vendas"
+        title="Lista de Ocorrências"
         link="/inicio"
       />
 
       <div className="card p-4 shadow-sm">
-        <h3 className="mb-4">Lista de Devoluções</h3>
+        <h3 className="mb-4">Lista de Ocorrências</h3>
 
-        <div className="row mb-3">
-          <div className="col-md-4">
+        <div className="row g-3 align-items-end mb-4">
+
+          <div className="col-md-3">
             <label className="form-label fw-semibold">
-              Filtrar por status
+              Status
             </label>
             <select
               className="form-select"
@@ -102,6 +112,38 @@ const ListReturnSalesStatus = () => {
               </option>
             </select>
           </div>
+
+          <div className="col-md-3">
+            <label className="form-label fw-semibold">Nome</label>
+            <input
+              type="text"
+              className="form-control"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              placeholder="Digite o nome"
+            />
+          </div>
+
+          <div className="col-md-3">
+            <label className="form-label fw-semibold">CPF</label>
+            <input
+              type="text"
+              className="form-control"
+              value={searchCpf}
+              onChange={(e) => setSearchCpf(e.target.value)}
+              placeholder="Digite o CPF"
+            />
+          </div>
+
+          <div className="col-md-2">
+            <button
+              className="btn btn-primary w-100"
+              onClick={() => fetchReturns(statusFilter, 0)}
+            >
+              Buscar
+            </button>
+          </div>
+
         </div>
 
         <div className="table-responsive">
@@ -121,7 +163,7 @@ const ListReturnSalesStatus = () => {
             <tbody>
               {returns.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="text-center text-muted">
+                  <td colSpan={8} className="text-center text-muted">
                     Nenhuma Venda encontrada.
                   </td>
                 </tr>
@@ -134,7 +176,10 @@ const ListReturnSalesStatus = () => {
                   <td>{r.productNameReturned}</td>
                   <td>{r.quantityReturned}</td>
                   <td>
-                    <span className={`badge bg-${statusColor[r.saleStatus] || "secondary"}`}>
+                    <span
+                      className={`badge bg-${statusColor[r.saleStatus] || "secondary"
+                        }`}
+                    >
                       {statusMap[r.saleStatus] || r.saleStatus}
                     </span>
                   </td>
@@ -145,6 +190,50 @@ const ListReturnSalesStatus = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* PAGINAÇÃO AQUI FORA */}
+        <div className="d-flex justify-content-end mt-3">
+          <nav>
+            <ul className="pagination pagination-sm mb-0 shadow-sm">
+
+              <li className={`page-item ${page === 0 ? "disabled" : ""}`}>
+                <button
+                  className="page-link"
+                  onClick={() => fetchReturns(statusFilter, page - 1)}
+                >
+                  «
+                </button>
+              </li>
+
+              {[...Array(totalPages)].map((_, index) => (
+                <li
+                  key={index}
+                  className={`page-item ${page === index ? "active" : ""}`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => fetchReturns(statusFilter, index)}
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
+
+              <li
+                className={`page-item ${page + 1 >= totalPages ? "disabled" : ""
+                  }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => fetchReturns(statusFilter, page + 1)}
+                >
+                  »
+                </button>
+              </li>
+
+            </ul>
+          </nav>
         </div>
       </div>
     </div>
