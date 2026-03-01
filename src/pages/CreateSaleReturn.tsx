@@ -39,23 +39,31 @@ const CreateSaleReturn = () => {
   const [description, setDescription] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
   const [searchCity, setSearchCity] = useState("");
+  const [page, setPage] = useState(0);
+  const [size] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [items, setItems] = useState<
     { productId: number; quantityReturned: number }[]
   >([]);
 
-  const searchSales = async () => {
+  const searchSales = async (pageNumber = 0) => {
     try {
-      const response = await api.get("sale/sales/search", {
+      const response = await api.get("/sale/sales/search", {
         params: {
           id: searchId ? Number(searchId) : undefined,
           name: searchName || undefined,
           cpf: searchCpf || undefined,
           city: searchCity || undefined,
+          page: pageNumber,
+          size: size,
+          sort: "saleDate,desc",
         },
       });
 
-      setSales(response.data);
+      setSales(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setPage(response.data.number);
     } catch (error) {
       console.error("Erro ao buscar vendas:", error);
     }
@@ -133,7 +141,10 @@ const CreateSaleReturn = () => {
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="mb-0 fw-semibold">Buscar Venda</h5>
-            <button className="btn btn-primary px-4" onClick={searchSales}>
+            <button
+              className="btn btn-primary px-4"
+              onClick={() => searchSales(0)}
+            >
               <i className="bi bi-search me-2"></i>
               Buscar
             </button>
@@ -186,7 +197,7 @@ const CreateSaleReturn = () => {
       </div>
 
       {/* 📋 RESULTADO DA BUSCA */}
-      {sales.length > 0 && (
+      {sales && (
         <div className="card border-0 shadow-sm mb-4">
           <div className="card-body p-0">
             <table className="table table-hover mb-0">
@@ -200,30 +211,96 @@ const CreateSaleReturn = () => {
                   <th className="text-end"></th>
                 </tr>
               </thead>
+
               <tbody>
-                {sales.map((sale) => (
-                  <tr key={sale.saleId}>
-                    <td>{sale.saleId}</td>
-                    <td>{sale.clientName}</td>
-                    <td>{sale.cpf}</td>
-                    <td>{sale.saleDate}</td>
-                    <td>{sale.city}</td>
-                    <td className="text-end">
-                      <button
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={() => loadSaleDetail(sale.saleId)}
-                      >
-                        Selecionar
-                      </button>
+                {sales.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="text-center py-4 text-muted">
+                      Nenhuma venda encontrada
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  sales.map((sale) => (
+                    <tr key={sale.saleId}>
+                      <td>{sale.saleId}</td>
+                      <td>{sale.clientName}</td>
+                      <td>{sale.cpf}</td>
+                      <td>{sale.saleDate}</td>
+                      <td>{sale.city}</td>
+                      <td className="text-end">
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => loadSaleDetail(sale.saleId)}
+                        >
+                          Selecionar
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
+
+            {/* PAGINAÇÃO */}
+            {totalPages > 0 && (
+              <div className="d-flex justify-content-between align-items-center p-3">
+                {/* Informação da página */}
+                <div className="text-muted small">
+                  Página {page + 1} de {totalPages}
+                </div>
+
+                {/* Navegação */}
+                <nav aria-label="Paginação de vendas">
+                  <ul className="pagination mb-0">
+                    {/* Anterior */}
+                    <li className={`page-item ${page === 0 ? "disabled" : ""}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => {
+                          if (page > 0) searchSales(page - 1);
+                        }}
+                      >
+                        «
+                      </button>
+                    </li>
+
+                    {/* Números das páginas */}
+                    {[...Array(totalPages)].map((_, index) => (
+                      <li
+                        key={index}
+                        className={`page-item ${page === index ? "active" : ""}`}
+                      >
+                        <button
+                          className="page-link"
+                          onClick={() => searchSales(index)}
+                        >
+                          {index + 1}
+                        </button>
+                      </li>
+                    ))}
+
+                    {/* Próxima */}
+                    <li
+                      className={`page-item ${
+                        page + 1 >= totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => {
+                          if (page + 1 < totalPages) searchSales(page + 1);
+                        }}
+                      >
+                        »
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
           </div>
         </div>
       )}
-
       {/* 🛒 DETALHE DA VENDA */}
       {selectedSale && (
         <div className="card border-0 shadow-sm">

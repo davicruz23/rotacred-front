@@ -62,7 +62,10 @@ const SessionsByDeviceChart = ({ data }: Props) => {
               show: true,
               fontSize: "13px",
               fontWeight: 400,
-              formatter: (val: number) => `${val.toFixed(0)}%`,
+              formatter: (val: any) => {
+                const number = Number(val);
+                return isNaN(number) ? "0%" : `${number.toFixed(0)}%`;
+              },
             },
           },
         },

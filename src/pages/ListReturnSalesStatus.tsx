@@ -49,10 +49,7 @@ const ListReturnSalesStatus = () => {
   const [searchName, setSearchName] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
 
-  const fetchReturns = async (
-    status?: number,
-    pageNumber = 0
-  ) => {
+  const fetchReturns = async (status?: number, pageNumber = 0) => {
     try {
       const response = await api.get("sale-return/sale-returns", {
         params: {
@@ -78,20 +75,14 @@ const ListReturnSalesStatus = () => {
 
   return (
     <div className="container-fluid px-1 my-1">
-      <BreadcrumbSection
-        title="Lista de Ocorrências"
-        link="/inicio"
-      />
+      <BreadcrumbSection title="Lista de Ocorrências" link="/inicio" />
 
       <div className="card p-4 shadow-sm">
         <h3 className="mb-4">Lista de Ocorrências</h3>
 
         <div className="row g-3 align-items-end mb-4">
-
           <div className="col-md-3">
-            <label className="form-label fw-semibold">
-              Status
-            </label>
+            <label className="form-label fw-semibold">Status</label>
             <select
               className="form-select"
               value={statusFilter}
@@ -104,12 +95,8 @@ const ListReturnSalesStatus = () => {
               <option value={ReturnStatusFilter.DESISTENCIA}>
                 DESISTÊNCIA
               </option>
-              <option value={ReturnStatusFilter.REAVIDO}>
-                RECUPERADO
-              </option>
-              <option value={ReturnStatusFilter.DANIFICADO}>
-                DANIFICADO
-              </option>
+              <option value={ReturnStatusFilter.REAVIDO}>RECUPERADO</option>
+              <option value={ReturnStatusFilter.DANIFICADO}>DANIFICADO</option>
             </select>
           </div>
 
@@ -143,7 +130,6 @@ const ListReturnSalesStatus = () => {
               Buscar
             </button>
           </div>
-
         </div>
 
         <div className="table-responsive">
@@ -177,8 +163,9 @@ const ListReturnSalesStatus = () => {
                   <td>{r.quantityReturned}</td>
                   <td>
                     <span
-                      className={`badge bg-${statusColor[r.saleStatus] || "secondary"
-                        }`}
+                      className={`badge bg-${
+                        statusColor[r.saleStatus] || "secondary"
+                      }`}
                     >
                       {statusMap[r.saleStatus] || r.saleStatus}
                     </span>
@@ -196,7 +183,6 @@ const ListReturnSalesStatus = () => {
         <div className="d-flex justify-content-end mt-3">
           <nav>
             <ul className="pagination pagination-sm mb-0 shadow-sm">
-
               <li className={`page-item ${page === 0 ? "disabled" : ""}`}>
                 <button
                   className="page-link"
@@ -221,8 +207,9 @@ const ListReturnSalesStatus = () => {
               ))}
 
               <li
-                className={`page-item ${page + 1 >= totalPages ? "disabled" : ""
-                  }`}
+                className={`page-item ${
+                  page + 1 >= totalPages ? "disabled" : ""
+                }`}
               >
                 <button
                   className="page-link"
@@ -231,7 +218,6 @@ const ListReturnSalesStatus = () => {
                   »
                 </button>
               </li>
-
             </ul>
           </nav>
         </div>

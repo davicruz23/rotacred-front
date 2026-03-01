@@ -78,7 +78,7 @@ const CommissionSellerPage = () => {
 
             {/* SELECT do cobrador */}
             <div className="col-md-4">
-              <label className="form-label">Cobrador *</label>
+              <label className="form-label">Vendedor *</label>
               <select
                 className="form-control"
                 value={sellerId}
