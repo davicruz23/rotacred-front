@@ -519,6 +519,10 @@ const navData = [
             subTitle: "Vendedor",
             subUrl: "/commission-seller",
           },
+          {
+            subTitle: "Histórico de Comissões",
+            subUrl: "/commission-history",
+          },
           // {
           //   subTitle: "Atualizar Produtos",
           //   subUrl: "/update-product",

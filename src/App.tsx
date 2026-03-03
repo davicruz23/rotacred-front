@@ -39,6 +39,8 @@ import ReportProductsPage from "./pages/ReportProducts";
 import ListReturnSalesStatus from "./pages/ListReturnSalesStatus";
 import CreateSaleReturn from "./pages/CreateSaleReturn";
 import UpdateSaleReturn from "./pages/UpdateSaleReturn";
+import CommissionHistoryCollectorPage from "./pages/CommissionHistoryPage";
+import CommissionHistory from "./pages/CommissionHistoryPage";
 
 function App() {
   const activeLayout = useAppSelector((state) => state.layout.isLayout);
@@ -86,6 +88,7 @@ function App() {
                 <Route path="/commision-collector" element={<CommissionCollectorrPage />} />
                 <Route path="/commission-seller" element={<CommissionSellerPage />} />
                 <Route path="/new-charging" element={<NewChargingPage />} />
+                <Route path="/commission-history" element={<CommissionHistory/>} />
               </Route>
 
               {/* ROTAS PARA SUPERADMIN + FUNCIONÁRIO */}

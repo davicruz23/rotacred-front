@@ -22,9 +22,9 @@ const TotalOrderCard4 = () => {
 
   const valorFormatado = data
     ? data.totalCobrado.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    })
+        style: "currency",
+        currency: "BRL",
+      })
     : "R$ 0,00";
 
   const percentual = data?.percentualCrescimento ?? 0;
@@ -39,12 +39,20 @@ const TotalOrderCard4 = () => {
         <h6 className="mb-0 fw-medium text-white">Total Cobrado</h6>
       </div>
       <h3 className="title my-4 text-white">{valorFormatado}</h3>
-      <div className="subtitle text-white d-flex align-items-center gap-1">
+
+      <div className="subtitle text-white">
         <i
-          className={`ti ${isPositive ? "ti-arrow-up" : "ti-arrow-down"
-            } ${isPositive ? "text-success" : "text-danger"}`}
+          className={`ti ${
+            isPositive
+              ? "ti-arrow-up text-success"
+              : "ti-arrow-down text-danger"
+          }`}
         ></i>
-        <span className="fw-semibold">
+        <span
+          className={`fw-semibold ${
+            isPositive ? "text-success" : "text-danger"
+          }`}
+        >
           {Math.abs(percentual).toFixed(1)}%
         </span>{" "}
         {isPositive ? "de aumento" : "de queda"}

@@ -19,67 +19,87 @@ const UsersCard2List = () => {
     load();
   }, []);
 
+  const radius = 26; const circumference = 2 * Math.PI * radius;
+
   return (
-    // container flex-column com gap (Bootstrap 5)
+
     <div className="d-flex flex-column gap-3">
-      {collectors.map((c) => (
-        <div
-          key={c.collectorId}
-          className="card saas-small-card" // card individual (sem wrapper extra)
-        >
-          <div className="d-flex align-items-center justify-content-between">
+      {collectors.map((c) => {
+        
+        const percentage =
+          c.totalToCollectThisMonth > 0
+            ? Math.min(
+                (c.totalCollectedToday / c.totalToCollectThisMonth) * 100,
+                100,
+              )
+            : 0;
 
-            {/* COLUNA ESQUERDA (TOTAL HOJE) */}
-            <div>
-              <h4>
-                {c.totalCollectedToday.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                })}
-              </h4>
-              <p className="mb-0">Hoje</p>
+        const offset = circumference - (percentage / 100) * circumference;
+
+        return (
+          <div key={c.collectorId} className="card saas-small-card">
+            <div className="d-flex align-items-center justify-content-between">
+              {/* Esperado */}
+              <div className="text-end">
+                <h4>
+                  {c.totalToCollectThisMonth.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </h4>
+                <p className="mb-0">Esperado</p>
+              </div>
+
+              {/* CÍRCULO DINÂMICO */}
+              <div className="progress-circle">
+                <span className="progress-text">{percentage.toFixed(0)}%</span>
+
+                <svg width="58" height="58">
+                  {/* Fundo */}
+                  <circle
+                    cx="29"
+                    cy="29"
+                    r={radius}
+                    stroke="#F5EFFF"
+                    strokeWidth="6"
+                    fill="none"
+                  />
+
+                  {/* Barra animada */}
+                  <circle
+                    cx="29"
+                    cy="29"
+                    r={radius}
+                    stroke="#39AD8A"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={offset}
+                    transform="rotate(-90 29 29)"
+                    style={{ transition: "stroke-dashoffset 0.6s ease" }}
+                  />
+                </svg>
+              </div>
+
+              {/* Hoje */}
+              <div>
+                <h4>
+                  {c.totalCollectedToday.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </h4>
+                <p className="mb-0">Hoje</p>
+              </div>
             </div>
 
-            {/* CÍRCULO (igual ao original) */}
-            <div className="progress-circle">
-              <span className="progress-text">Cobr.</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="58"
-                height="58"
-                viewBox="0 0 58 58"
-                fill="none"
-              >
-                <circle cx="29" cy="29" r="26" stroke="#F5EFFF" strokeWidth="6" />
-                <path
-                  d="M55 29C55 43.3594 43.3594 55 29 55C14.6406 55 3 43.3594 3 29C3 14.6406 14.6406 3 29 3"
-                  stroke="#39AD8A"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                />
-              </svg>
+            <div className="mt-2 text-center">
+              <small className="fw-bold">{c.collectorName}</small>
             </div>
-
-            {/* COLUNA DIREITA (ESPERADO) */}
-            <div className="text-end">
-              <h4>
-                {c.totalToCollectThisMonth.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                })}
-              </h4>
-              <p className="mb-0">Esperado</p>
-            </div>
-
           </div>
-
-          {/* nome embaixo */}
-          <div className="mt-2 text-center">
-            <small className="fw-bold">{c.collectorName}</small>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
-
 };
 
 export default UsersCard2List;

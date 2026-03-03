@@ -124,7 +124,7 @@ const CreateSaleReturn = () => {
       setDescription("");
       setStatus("");
     } catch (error) {
-      console.error("Erro ao registrar devolução:", error);
+      console.error("Erro ao registrar ocorrência:", error);
     }
   };
 
@@ -134,7 +134,7 @@ const CreateSaleReturn = () => {
 
   return (
     <div className="container-fluid px-1 my-1">
-      <BreadcrumbSection title="Registrar Devolução" link="/inicio" />
+      <BreadcrumbSection title="Registrar Ocorrência" link="/inicio" />
 
       {/* 🔎 CARD DE BUSCA */}
       <div className="card border-0 shadow-sm mb-4">
@@ -399,7 +399,7 @@ const CreateSaleReturn = () => {
                 onClick={handleSubmit}
                 disabled={!isFormValid}
               >
-                Registrar Devolução
+                Registrar Ocorrência
               </button>
             </div>
           </div>

@@ -139,11 +139,11 @@ const UpdateSaleReturn = () => {
               <thead className="table-light">
                 <tr>
                   <th>N° VENDA</th>
-                  <th>Cliente</th>
-                  <th>Produto</th>
-                  <th>Qtd</th>
-                  <th>Data</th>
-                  <th className="text-end">Status</th>
+                  <th>CLIENTE</th>
+                  <th>PRODUTO</th>
+                  <th>QTD</th>
+                  <th>DATA - HORA</th>
+                  <th className="text-end">STATUS</th>
                 </tr>
               </thead>
               <tbody>

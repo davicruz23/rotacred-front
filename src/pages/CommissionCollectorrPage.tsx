@@ -16,7 +16,6 @@ type CommissionResponse = {
 };
 
 const CommissionCollectorPage = () => {
-
   const [collectors, setCollectors] = useState<CollectorOption[]>([]);
   const [collectorId, setCollectorId] = useState<number | "">("");
 
@@ -78,7 +77,6 @@ const CommissionCollectorPage = () => {
               <h4 className="card-title mb-4">Consultar Comissão</h4>
 
               <div className="row g-3">
-
                 {/* SELECT do cobrador */}
                 <div className="col-md-4">
                   <label className="form-label">Cobrador *</label>
@@ -86,7 +84,9 @@ const CommissionCollectorPage = () => {
                     className="form-control"
                     value={collectorId}
                     onChange={(e) =>
-                      setCollectorId(e.target.value ? Number(e.target.value) : "")
+                      setCollectorId(
+                        e.target.value ? Number(e.target.value) : "",
+                      )
                     }
                   >
                     <option value="">Selecione...</option>
@@ -145,9 +145,7 @@ const CommissionCollectorPage = () => {
               </div>
 
               {/* Resultado */}
-              {loading && (
-                <div className="text-center mt-4">Carregando...</div>
-              )}
+              {loading && <div className="text-center mt-4">Carregando...</div>}
 
               {response && (
                 <div className="alert alert-success mt-4">
