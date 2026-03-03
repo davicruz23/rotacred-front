@@ -39,7 +39,6 @@ import ReportProductsPage from "./pages/ReportProducts";
 import ListReturnSalesStatus from "./pages/ListReturnSalesStatus";
 import CreateSaleReturn from "./pages/CreateSaleReturn";
 import UpdateSaleReturn from "./pages/UpdateSaleReturn";
-import CommissionHistoryCollectorPage from "./pages/CommissionHistoryPage";
 import CommissionHistory from "./pages/CommissionHistoryPage";
 
 function App() {
