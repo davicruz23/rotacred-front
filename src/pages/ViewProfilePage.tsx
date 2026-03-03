@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-import { useNavigate } from "react-router-dom";
 
 type Usuario = {
   id: number;
@@ -57,8 +56,6 @@ const ViewProfilePage = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
-
-  const navigate = useNavigate();
 
   return (
     <div className="row g-4">
