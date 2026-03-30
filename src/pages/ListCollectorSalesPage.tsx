@@ -38,6 +38,7 @@ type InstallmentType = {
 
 type SaleType = {
   id: number;
+  fullPaid: boolean;
   numberSale: string;
   saleDate: string;
   paymentType: string;
@@ -70,11 +71,15 @@ enum SaleStatusFilter {
   REAVIDO = 5,
 }
 
+type PaymentFilterType = "TODOS" | "ATIVOS" | "INATIVOS";
+
 const ListCollectorSalesPage = () => {
   const [collectorData, setCollectorData] = useState<CollectorType[]>([]);
   const [collectors, setCollectors] = useState<CollectorSimpleType[]>([]);
   const [statusFilter, setStatusFilter] = useState<number>(0);
   const [collectorFilter, setCollectorFilter] = useState<number | null>(null);
+  const [paymentFilter, setPaymentFilter] =
+    useState<PaymentFilterType>("TODOS");
 
   const fetchCollectors = async () => {
     try {
@@ -87,7 +92,8 @@ const ListCollectorSalesPage = () => {
 
   const fetchCollectorsWithSales = async (
     status?: number,
-    collectorId?: number | null
+    collectorId?: number | null,
+    paymentFilter?: PaymentFilterType,
   ) => {
     try {
       let url = "/collector/all/sales";
@@ -99,6 +105,12 @@ const ListCollectorSalesPage = () => {
 
       if (collectorId) {
         params.push(`collectorId=${collectorId}`);
+      }
+
+      const fullPaid = mapPaymentFilterToParam(paymentFilter ?? "TODOS");
+
+      if (fullPaid !== undefined) {
+        params.push(`fullPaid=${fullPaid}`);
       }
 
       if (params.length > 0) {
@@ -118,24 +130,32 @@ const ListCollectorSalesPage = () => {
   }, []);
 
   useEffect(() => {
-    fetchCollectorsWithSales(statusFilter, collectorFilter);
-  }, [statusFilter, collectorFilter]);
+    fetchCollectorsWithSales(statusFilter, collectorFilter, paymentFilter);
+  }, [statusFilter, collectorFilter, paymentFilter]);
+
+  const mapPaymentFilterToParam = (
+    filter: PaymentFilterType,
+  ): boolean | undefined => {
+    switch (filter) {
+      case "ATIVOS":
+        return false; // tem parcela em aberto
+      case "INATIVOS":
+        return true; // tudo pago
+      default:
+        return undefined; // não envia → TODOS
+    }
+  };
 
   return (
     <div className="container-fluid px-1 my-1">
-      <BreadcrumbSection
-        title="Lista de venda para cobrança"
-        link="/inicio"
-      />
+      <BreadcrumbSection title="Lista de venda para cobrança" link="/inicio" />
 
       <div className="card p-4 shadow-sm">
         <h3 className="mb-4">Lista de cobranças</h3>
 
         <div className="row mb-3">
           <div className="col-md-4">
-            <label className="form-label fw-semibold">
-              Filtrar por status
-            </label>
+            <label className="form-label fw-semibold">Vendas por status</label>
             <select
               className="form-select"
               value={statusFilter}
@@ -144,22 +164,20 @@ const ListCollectorSalesPage = () => {
               <option value={SaleStatusFilter.TODOS}>TODOS</option>
               <option value={SaleStatusFilter.ATIVOS}>ATIVOS</option>
               <option value={SaleStatusFilter.REAVIDO}>RECUPERADOS</option>
-              <option value={SaleStatusFilter.DESISTENCIA}>
-                DESISTÊNCIAS
-              </option>
+              <option value={SaleStatusFilter.DESISTENCIA}>DESISTÊNCIAS</option>
             </select>
           </div>
 
           <div className="col-md-4">
             <label className="form-label fw-semibold">
-              Filtrar por cobrador
+              Vendas por cobrador
             </label>
             <select
               className="form-select"
               value={collectorFilter ?? ""}
               onChange={(e) =>
                 setCollectorFilter(
-                  e.target.value ? Number(e.target.value) : null
+                  e.target.value ? Number(e.target.value) : null,
                 )
               }
             >
@@ -169,6 +187,23 @@ const ListCollectorSalesPage = () => {
                   {c.collectorName.toUpperCase()}
                 </option>
               ))}
+            </select>
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label fw-semibold">
+              Vendas Ativas/Finalizadas
+            </label>
+            <select
+              className="form-select"
+              value={paymentFilter}
+              onChange={(e) =>
+                setPaymentFilter(e.target.value as PaymentFilterType)
+              }
+            >
+              <option value="TODOS">TODOS</option>
+              <option value="ATIVOS">ATIVOS</option>
+              <option value="INATIVOS">FINALIZADOS</option>
             </select>
           </div>
         </div>
@@ -188,8 +223,7 @@ const ListCollectorSalesPage = () => {
                   aria-expanded="false"
                   aria-controls={`coll-${collector.id}`}
                 >
-                  {collector.collectorName} (
-                  {collector.sales.length} Cobranças)
+                  {collector.collectorName} ({collector.sales.length} Cobranças)
                 </button>
               </h2>
               <div
@@ -220,15 +254,24 @@ const ListCollectorSalesPage = () => {
                                 isReadOnlySale
                                   ? "bg-secondary text-white"
                                   : "bg-light"
-                              }`}
+                              } d-flex justify-content-between align-items-center`}
                               type="button"
                               data-bs-toggle="collapse"
                               data-bs-target={`#sale-${sale.id}`}
                               aria-expanded="false"
                               aria-controls={`sale-${sale.id}`}
                             >
-                              Venda #{sale.id} — {sale.clientName}
-                              {isReadOnlySale}
+                              <span>
+                                Venda #{sale.id} — {sale.clientName}
+                              </span>
+
+                              <span
+                                className={`badge ms-2 ${
+                                  sale.fullPaid ? "bg-secondary" : "bg-success"
+                                }`}
+                              >
+                                {sale.fullPaid ? "FINALIZADO" : "ATIVO"}
+                              </span>
                             </button>
                           </h2>
 
