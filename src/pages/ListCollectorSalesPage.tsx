@@ -254,24 +254,28 @@ const ListCollectorSalesPage = () => {
                                 isReadOnlySale
                                   ? "bg-secondary text-white"
                                   : "bg-light"
-                              } d-flex justify-content-between align-items-center`}
+                              }`}
                               type="button"
                               data-bs-toggle="collapse"
                               data-bs-target={`#sale-${sale.id}`}
                               aria-expanded="false"
                               aria-controls={`sale-${sale.id}`}
                             >
-                              <span>
-                                Venda #{sale.id} — {sale.clientName}
-                              </span>
+                              <div className="d-flex w-100 align-items-center">
+                                <span>
+                                  Venda #{sale.id} — {sale.clientName}
+                                </span>
 
-                              <span
-                                className={`badge ms-2 ${
-                                  sale.fullPaid ? "bg-secondary" : "bg-success"
-                                }`}
-                              >
-                                {sale.fullPaid ? "FINALIZADO" : "ATIVO"}
-                              </span>
+                                <span
+                                  className={`badge ms-auto me-3 ${
+                                    sale.fullPaid
+                                      ? "bg-secondary"
+                                      : "bg-success"
+                                  }`}
+                                >
+                                  {sale.fullPaid ? "FINALIZADO" : "ATIVO"}
+                                </span>
+                              </div>
                             </button>
                           </h2>
 
