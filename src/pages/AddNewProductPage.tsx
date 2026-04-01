@@ -42,94 +42,212 @@ const AddNewProductPage = () => {
     }
   };
 
+  /* ── estilos ── */
+  const S: Record<string, React.CSSProperties> = {
+    page: {
+      padding: "0 4px",
+    },
+    formCard: {
+      background: "#fff",
+      border: "0.5px solid #e0e0e0",
+      borderRadius: 12,
+      overflow: "hidden",
+      marginTop: 16,
+    },
+    cardHead: {
+      padding: "16px 20px",
+      borderBottom: "0.5px solid #e0e0e0",
+      background: "#f8f9fa",
+    },
+    cardTitle: {
+      fontSize: 15,
+      fontWeight: 600,
+      color: "#1a1a1a",
+      margin: 0,
+    },
+    cardSub: {
+      fontSize: 12,
+      color: "#888",
+      marginTop: 3,
+    },
+    cardBody: {
+      padding: 20,
+    },
+    grid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+      gap: 16,
+    },
+    field: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 5,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: 600,
+      color: "#888",
+    },
+    input: {
+      border: "0.5px solid #d0d0d0",
+      borderRadius: 8,
+      padding: "9px 12px",
+      fontSize: 13,
+      color: "#1a1a1a",
+      background: "#fff",
+      outline: "none",
+      width: "100%",
+    },
+    prefixWrap: {
+      display: "flex",
+      alignItems: "center",
+      border: "0.5px solid #d0d0d0",
+      borderRadius: 8,
+      overflow: "hidden",
+      background: "#fff",
+    },
+    prefix: {
+      padding: "9px 12px",
+      fontSize: 13,
+      color: "#888",
+      background: "#f8f9fa",
+      borderRight: "0.5px solid #e0e0e0",
+      whiteSpace: "nowrap" as const,
+      flexShrink: 0,
+    },
+    prefixInput: {
+      border: "none",
+      outline: "none",
+      padding: "9px 12px",
+      fontSize: 13,
+      color: "#1a1a1a",
+      background: "transparent",
+      width: "100%",
+    },
+    divider: {
+      border: "none",
+      borderTop: "0.5px solid #e0e0e0",
+      margin: "20px 0 16px",
+    },
+    submitBtn: {
+      width: "100%",
+      padding: "11px",
+      borderRadius: 8,
+      border: "none",
+      background: "#185FA5",
+      color: "#E6F1FB",
+      fontSize: 14,
+      fontWeight: 600,
+      cursor: "pointer",
+    },
+  };
+
   return (
-    <div className="row g-4">
-      <div className="col-12">
-        <BreadcrumbSection title="Adicionar Novo Produto" link="/all-product" />
-      </div>
+    <div style={S.page}>
+      <div className="row g-4">
+        <div className="col-12">
+          <BreadcrumbSection
+            title="Adicionar Novo Produto"
+            link="/all-product"
+          />
+        </div>
 
-      <div className="col-12">
-        <div className="card shadow-sm">
-          <div className="card-header bg-white">
-            <h3 className="mb-0">Informações do Produto</h3>
-          </div>
-          <div className="card-body">
-            <form onSubmit={handleSubmit} className="row g-3">
-              <div className="col-md-6">
-                <label className="form-label">Nome do Produto</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={product.name}
-                  onChange={handleChange}
-                  className="form-control"
-                  placeholder="Digite o nome do produto"
-                  required
-                />
+        <div className="col-12">
+          <div style={S.formCard}>
+            <div style={S.cardHead}>
+              <div style={S.cardTitle}>Informações do produto</div>
+              <div style={S.cardSub}>
+                Preencha os campos abaixo para cadastrar um novo produto
               </div>
+            </div>
 
-              <div className="col-md-6">
-                <label className="form-label">Marca</label>
-                <input
-                  type="text"
-                  name="brand"
-                  value={product.brand}
-                  onChange={handleChange}
-                  className="form-control"
-                  placeholder="Marca do produto"
-                  required
-                />
-              </div>
+            <div style={S.cardBody}>
+              <form onSubmit={handleSubmit}>
+                <div style={S.grid}>
+                  {/* Nome */}
+                  <div style={S.field}>
+                    <label style={S.label}>Nome do produto</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={product.name}
+                      onChange={handleChange}
+                      style={S.input}
+                      placeholder="Digite o nome do produto"
+                      required
+                    />
+                  </div>
 
-              <div className="col-md-6">
-                <label className="form-label">Quantidade</label>
-                <input
-                  type="number"
-                  name="amount"
-                  value={product.amount === 0 ? "" : product.amount}
-                  onChange={(e) =>
-                    setProduct((prev) => ({
-                      ...prev,
-                      amount:
-                        e.target.value === "" ? 0 : Number(e.target.value),
-                    }))
-                  }
-                  className="form-control"
-                  min={0}
-                  placeholder="0"
-                  required
-                />
-              </div>
+                  {/* Marca */}
+                  <div style={S.field}>
+                    <label style={S.label}>Marca</label>
+                    <input
+                      type="text"
+                      name="brand"
+                      value={product.brand}
+                      onChange={handleChange}
+                      style={S.input}
+                      placeholder="Marca do produto"
+                      required
+                    />
+                  </div>
 
-              <div className="col-md-6">
-                <label className="form-label">Valor (R$)</label>
-                <div className="input-group">
-                  <span className="input-group-text">R$</span>
-                  <input
-                    type="number"
-                    name="value"
-                    value={product.value === 0 ? "" : product.value}
-                    onChange={(e) =>
-                      setProduct((prev) => ({
-                        ...prev,
-                        value:
-                          e.target.value === "" ? 0 : Number(e.target.value),
-                      }))
-                    }
-                    className="form-control"
-                    min={0}
-                    step={0.01}
-                    placeholder="0,00"
-                    required
-                  />
+                  {/* Quantidade */}
+                  <div style={S.field}>
+                    <label style={S.label}>Quantidade em estoque</label>
+                    <input
+                      type="number"
+                      name="amount"
+                      value={product.amount === 0 ? "" : product.amount}
+                      onChange={(e) =>
+                        setProduct((prev) => ({
+                          ...prev,
+                          amount:
+                            e.target.value === "" ? 0 : Number(e.target.value),
+                        }))
+                      }
+                      style={S.input}
+                      min={0}
+                      placeholder="0"
+                      required
+                    />
+                  </div>
+
+                  {/* Valor */}
+                  <div style={S.field}>
+                    <label style={S.label}>Valor (R$)</label>
+                    <div style={S.prefixWrap}>
+                      <span style={S.prefix}>R$</span>
+                      <input
+                        type="number"
+                        name="value"
+                        value={product.value === 0 ? "" : product.value}
+                        onChange={(e) =>
+                          setProduct((prev) => ({
+                            ...prev,
+                            value:
+                              e.target.value === ""
+                                ? 0
+                                : Number(e.target.value),
+                          }))
+                        }
+                        style={S.prefixInput}
+                        min={0}
+                        step={0.01}
+                        placeholder="0,00"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="col-12 mt-4">
-                <button type="submit" className="btn btn-primary btn-lg w-100">
-                  Adicionar Produto
+
+                <hr style={S.divider} />
+
+                <button type="submit" style={S.submitBtn}>
+                  Adicionar produto
                 </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>

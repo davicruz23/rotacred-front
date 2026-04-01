@@ -675,7 +675,7 @@ const ListCollectorSalesPage = () => {
                                               marginTop: 2,
                                             }}
                                           >
-                                            Abatido: R$ {s.valueAbatido}
+                                            Abatido das parcelas: R$ {s.valueAbatido}
                                           </div>
                                           <div
                                             style={{
