@@ -20,25 +20,187 @@ type SaleReturnType = {
 enum ReturnStatusFilter {
   TODOS = 0,
   DEFEITO_PRODUTO = 2,
-
   DESISTENCIA = 4,
   REAVIDO = 5,
   DANIFICADO = 6,
 }
 
 const statusMap: Record<number, string> = {
-  2: "NA GARANTIA",
-  3: "DEVOLVIDO",
-  4: "DESISTÊNCIA",
-  5: "RECUPERADO",
-  6: "DANIFICADO",
+  2: "Na garantia",
+  3: "Devolvido",
+  4: "Desistência",
+  5: "Recuperado",
+  6: "Danificado",
 };
 
-const statusColor: Record<number, string> = {
-  4: "warning",
-  5: "success",
-  6: "danger",
+const statusBadge: Record<number, React.CSSProperties> = {
+  2: { background: "#E6F1FB", color: "#185FA5" },
+  3: { background: "#F1EFE8", color: "#5F5E5A" },
+  4: { background: "#FAEEDA", color: "#854F0B" },
+  5: { background: "#EAF3DE", color: "#3B6D11" },
+  6: { background: "#FCEBEB", color: "#A32D2D" },
 };
+
+const S: Record<string, React.CSSProperties> = {
+  page: { padding: "0 4px" },
+
+  card: {
+    background: "#fff",
+    border: "0.5px solid #e0e0e0",
+    borderRadius: 12,
+    overflow: "hidden",
+    marginTop: 16,
+  },
+
+  cardHead: {
+    padding: "16px 20px",
+    borderBottom: "0.5px solid #e0e0e0",
+    background: "#f8f9fa",
+  },
+
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: 600,
+    color: "#1a1a1a",
+    margin: 0,
+  },
+
+  cardBody: { padding: 20 },
+
+  filters: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+    gap: 12,
+    marginBottom: 20,
+    alignItems: "flex-end",
+  },
+
+  field: { display: "flex", flexDirection: "column", gap: 5 },
+
+  label: {
+    fontSize: 12,
+    fontWeight: 600,
+    color: "#888",
+  },
+
+  input: {
+    border: "0.5px solid #d0d0d0",
+    borderRadius: 8,
+    padding: "8px 12px",
+    fontSize: 13,
+    color: "#1a1a1a",
+    background: "#fff",
+    outline: "none",
+    width: "100%",
+  },
+
+  select: {
+    border: "0.5px solid #d0d0d0",
+    borderRadius: 8,
+    padding: "8px 12px",
+    fontSize: 13,
+    color: "#1a1a1a",
+    background: "#fff",
+    outline: "none",
+    width: "100%",
+  },
+
+  searchBtn: {
+    padding: "9px 20px",
+    borderRadius: 8,
+    border: "none",
+    background: "#185FA5",
+    color: "#E6F1FB",
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+    width: "100%",
+  },
+
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 13,
+  },
+
+  th: {
+    textAlign: "left",
+    padding: "9px 12px",
+    fontSize: 11,
+    fontWeight: 600,
+    color: "#888",
+    borderBottom: "0.5px solid #e0e0e0",
+    background: "#f8f9fa",
+    whiteSpace: "nowrap",
+  },
+
+  td: {
+    padding: "9px 12px",
+    borderBottom: "0.5px solid #e0e0e0",
+    color: "#1a1a1a",
+    verticalAlign: "middle",
+  },
+
+  tdMuted: {
+    padding: "9px 12px",
+    borderBottom: "0.5px solid #e0e0e0",
+    color: "#aaa",
+    fontSize: 12,
+    verticalAlign: "middle",
+  },
+
+  tdDesc: {
+    padding: "9px 12px",
+    borderBottom: "0.5px solid #e0e0e0",
+    color: "#888",
+    fontSize: 12,
+    verticalAlign: "middle",
+    maxWidth: 200,
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+
+  footer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 14,
+    flexWrap: "wrap",
+    gap: 8,
+  },
+
+  pgInfo: {
+    fontSize: 12,
+    color: "#aaa",
+  },
+
+  pgBtns: { display: "flex", gap: 4 },
+};
+
+const getBadgeStyle = (status: number): React.CSSProperties => ({
+  display: "inline-block",
+  padding: "3px 9px",
+  borderRadius: 999,
+  fontSize: 11,
+  fontWeight: 600,
+  ...(statusBadge[status] ?? { background: "#F1EFE8", color: "#5F5E5A" }),
+});
+
+const getPgBtnStyle = (
+  active: boolean,
+  disabled: boolean,
+): React.CSSProperties => ({
+  border: "0.5px solid #d0d0d0",
+  borderRadius: 6,
+  padding: "5px 10px",
+  fontSize: 12,
+  cursor: disabled ? "default" : "pointer",
+  background: active ? "#185FA5" : "#fff",
+  color: active ? "#E6F1FB" : "#1a1a1a",
+  opacity: disabled ? 0.4 : 1,
+});
 
 const ListReturnSalesStatus = () => {
   const [returns, setReturns] = useState<SaleReturnType[]>([]);
@@ -60,7 +222,6 @@ const ListReturnSalesStatus = () => {
           size: size,
         },
       });
-
       setReturns(response.data.content);
       setTotalPages(response.data.totalPages);
       setPage(response.data.number);
@@ -74,152 +235,171 @@ const ListReturnSalesStatus = () => {
   }, [statusFilter]);
 
   return (
-    <div className="container-fluid px-1 my-1">
-      <BreadcrumbSection title="Lista de Ocorrências" link="/inicio" />
+    <div style={S.page}>
+      <div className="container-fluid px-1 my-1">
+        <BreadcrumbSection title="Lista de Ocorrências" link="/inicio" />
 
-      <div className="card p-4 shadow-sm">
-        <h3 className="mb-4">Lista de Ocorrências</h3>
-
-        <div className="row g-3 align-items-end mb-4">
-          <div className="col-md-3">
-            <label className="form-label fw-semibold">Status</label>
-            <select
-              className="form-select"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(Number(e.target.value))}
-            >
-              <option value={ReturnStatusFilter.TODOS}>TODOS</option>
-              <option value={ReturnStatusFilter.DEFEITO_PRODUTO}>
-                GARANTIA
-              </option>
-              <option value={ReturnStatusFilter.DESISTENCIA}>
-                DESISTÊNCIA
-              </option>
-              <option value={ReturnStatusFilter.REAVIDO}>RECUPERADO</option>
-              <option value={ReturnStatusFilter.DANIFICADO}>DANIFICADO</option>
-            </select>
+        <div style={S.card}>
+          <div style={S.cardHead}>
+            <div style={S.cardTitle}>Lista de ocorrências</div>
           </div>
 
-          <div className="col-md-3">
-            <label className="form-label fw-semibold">Nome</label>
-            <input
-              type="text"
-              className="form-control"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-              placeholder="Digite o nome"
-            />
-          </div>
+          <div style={S.cardBody}>
+            {/* ── Filtros ── */}
+            <div style={S.filters}>
+              <div style={S.field}>
+                <label style={S.label}>Status</label>
+                <select
+                  style={S.select}
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(Number(e.target.value))}
+                >
+                  <option value={ReturnStatusFilter.TODOS}>Todos</option>
+                  <option value={ReturnStatusFilter.DEFEITO_PRODUTO}>
+                    Garantia
+                  </option>
+                  <option value={ReturnStatusFilter.DESISTENCIA}>
+                    Desistência
+                  </option>
+                  <option value={ReturnStatusFilter.REAVIDO}>Recuperado</option>
+                  <option value={ReturnStatusFilter.DANIFICADO}>
+                    Danificado
+                  </option>
+                </select>
+              </div>
 
-          <div className="col-md-3">
-            <label className="form-label fw-semibold">CPF</label>
-            <input
-              type="text"
-              className="form-control"
-              value={searchCpf}
-              onChange={(e) => setSearchCpf(e.target.value)}
-              placeholder="Digite o CPF"
-            />
-          </div>
+              <div style={S.field}>
+                <label style={S.label}>Nome do cliente</label>
+                <input
+                  type="text"
+                  style={S.input}
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  placeholder="Digite o nome"
+                />
+              </div>
 
-          <div className="col-md-2">
-            <button
-              className="btn btn-primary w-100"
-              onClick={() => fetchReturns(statusFilter, 0)}
-            >
-              Buscar
-            </button>
-          </div>
-        </div>
+              <div style={S.field}>
+                <label style={S.label}>CPF</label>
+                <input
+                  type="text"
+                  style={S.input}
+                  value={searchCpf}
+                  onChange={(e) => setSearchCpf(e.target.value)}
+                  placeholder="Digite o CPF"
+                />
+              </div>
 
-        <div className="table-responsive">
-          <table className="table table-hover table-bordered align-middle">
-            <thead className="table-light">
-              <tr>
-                <th>N° VENDA</th>
-                <th>Cliente</th>
-                <th>Produto</th>
-                <th>Qtd</th>
-                <th>Status</th>
-                <th>Data Devolução</th>
-                <th>Data Venda</th>
-                <th>Descrição</th>
-              </tr>
-            </thead>
-            <tbody>
-              {returns.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="text-center text-muted">
-                    Nenhuma Venda encontrada.
-                  </td>
-                </tr>
-              )}
-
-              {returns.map((r) => (
-                <tr key={r.saleReturnId}>
-                  <td>{r.saleDTO.saleId}</td>
-                  <td>{r.saleDTO.clientName}</td>
-                  <td>{r.productNameReturned}</td>
-                  <td>{r.quantityReturned}</td>
-                  <td>
-                    <span
-                      className={`badge bg-${
-                        statusColor[r.saleStatus] || "secondary"
-                      }`}
-                    >
-                      {statusMap[r.saleStatus] || r.saleStatus}
-                    </span>
-                  </td>
-                  <td>{r.returnDate}</td>
-                  <td>{r.saleDTO.saleDate}</td>
-                  <td>{r.description}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* PAGINAÇÃO AQUI FORA */}
-        <div className="d-flex justify-content-end mt-3">
-          <nav>
-            <ul className="pagination pagination-sm mb-0 shadow-sm">
-              <li className={`page-item ${page === 0 ? "disabled" : ""}`}>
+              <div style={S.field}>
                 <button
-                  className="page-link"
+                  style={S.searchBtn}
+                  onClick={() => fetchReturns(statusFilter, 0)}
+                >
+                  Buscar
+                </button>
+              </div>
+            </div>
+
+            {/* ── Tabela ── */}
+            <div style={{ overflowX: "auto" }}>
+              <table style={S.table}>
+                <thead>
+                  <tr>
+                    <th style={S.th}>N° venda</th>
+                    <th style={S.th}>Cliente</th>
+                    <th style={S.th}>Produto</th>
+                    <th style={S.th}>Qtd</th>
+                    <th style={S.th}>Status</th>
+                    <th style={S.th}>Data devolução</th>
+                    <th style={S.th}>Data venda</th>
+                    <th style={S.th}>Descrição</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {returns.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={8}
+                        style={{
+                          ...S.td,
+                          textAlign: "center",
+                          color: "#aaa",
+                          padding: "24px 0",
+                        }}
+                      >
+                        Nenhuma ocorrência encontrada.
+                      </td>
+                    </tr>
+                  )}
+
+                  {returns.map((r) => (
+                    <tr
+                      key={r.saleReturnId}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLTableRowElement)
+                          .querySelectorAll("td")
+                          .forEach((td) => (td.style.background = "#f8f9fa"));
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLTableRowElement)
+                          .querySelectorAll("td")
+                          .forEach((td) => (td.style.background = ""));
+                      }}
+                    >
+                      <td style={S.tdMuted}>{r.saleDTO.saleId}</td>
+                      <td style={S.td}>{r.saleDTO.clientName}</td>
+                      <td style={S.td}>{r.productNameReturned}</td>
+                      <td style={S.td}>{r.quantityReturned}</td>
+                      <td style={S.td}>
+                        <span style={getBadgeStyle(r.saleStatus)}>
+                          {statusMap[r.saleStatus] || String(r.saleStatus)}
+                        </span>
+                      </td>
+                      <td style={S.td}>{r.returnDate}</td>
+                      <td style={S.td}>{r.saleDTO.saleDate}</td>
+                      <td style={S.tdDesc} title={r.description}>
+                        {r.description}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ── Paginação ── */}
+            <div style={S.footer}>
+              <span style={S.pgInfo}>
+                Página {page + 1} de {totalPages || 1}
+              </span>
+              <div style={S.pgBtns}>
+                <button
+                  style={getPgBtnStyle(false, page === 0)}
+                  disabled={page === 0}
                   onClick={() => fetchReturns(statusFilter, page - 1)}
                 >
                   «
                 </button>
-              </li>
 
-              {[...Array(totalPages)].map((_, index) => (
-                <li
-                  key={index}
-                  className={`page-item ${page === index ? "active" : ""}`}
-                >
+                {[...Array(totalPages)].map((_, index) => (
                   <button
-                    className="page-link"
+                    key={index}
+                    style={getPgBtnStyle(page === index, false)}
                     onClick={() => fetchReturns(statusFilter, index)}
                   >
                     {index + 1}
                   </button>
-                </li>
-              ))}
+                ))}
 
-              <li
-                className={`page-item ${
-                  page + 1 >= totalPages ? "disabled" : ""
-                }`}
-              >
                 <button
-                  className="page-link"
+                  style={getPgBtnStyle(false, page + 1 >= totalPages)}
+                  disabled={page + 1 >= totalPages}
                   onClick={() => fetchReturns(statusFilter, page + 1)}
                 >
                   »
                 </button>
-              </li>
-            </ul>
-          </nav>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
