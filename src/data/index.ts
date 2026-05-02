@@ -578,102 +578,18 @@ const navData = [
   {
     category: "administração",
     links: [
-      // {
-      //   title: "Authentication",
-      //   hasSub: true,
-      //   icon: "ti ti-lock-access",
-      //   url: "#",
-      //   subLinks: [
-      //     {
-      //       subTitle: "Login 01",
-      //       subUrl: "/login",
-      //     },
-      //     {
-      //       subTitle: "Login 02",
-      //       subUrl: "/login-2",
-      //     },
-      //     {
-      //       subTitle: "Login 03",
-      //       subUrl: "/login-3",
-      //     },
-      //     {
-      //       subTitle: "Registration 01",
-      //       subUrl: "/registration",
-      //     },
-      //     {
-      //       subTitle: "Registration 02",
-      //       subUrl: "/registration-2",
-      //     },
-      //     {
-      //       subTitle: "Reset Password",
-      //       subUrl: "/reset-password",
-      //     },
-      //     {
-      //       subTitle: "Update Password",
-      //       subUrl: "/update-password",
-      //     },
-      //     {
-      //       subTitle: "Login Status",
-      //       subUrl: "/login-status",
-      //     },
-      //     {
-      //       subTitle: "Account Deactivated",
-      //       subUrl: "/account-deactivated",
-      //     },
-      //     {
-      //       subTitle: "Welcome",
-      //       subUrl: "/welcome",
-      //     },
-      //     {
-      //       subTitle: "Verify Email",
-      //       subUrl: "/email-verify",
-      //     },
-      //     {
-      //       subTitle: "Two Factor Verification",
-      //       subUrl: "/two-factor",
-      //     },
-      //     {
-      //       subTitle: "Multi Step Signup",
-      //       subUrl: "/multi-step-signup",
-      //     },
-      //   ],
-      // },
-      // {
-      //   title: "Error Pages",
-      //   hasSub: true,
-      //   icon: "ti ti-face-id-error",
-      //   url: "#",
-      //   subLinks: [
-      //     {
-      //       subTitle: "Error 400",
-      //       subUrl: "/error-400",
-      //     },
-      //     {
-      //       subTitle: "Error 403",
-      //       subUrl: "/error-403",
-      //     },
-      //     {
-      //       subTitle: "Error 404",
-      //       subUrl: "/error-404",
-      //     },
-      //     {
-      //       subTitle: "Error 408",
-      //       subUrl: "/error-408",
-      //     },
-      //     {
-      //       subTitle: "Error 500",
-      //       subUrl: "/error-500",
-      //     },
-      //     {
-      //       subTitle: "Error 503",
-      //       subUrl: "/error-503",
-      //     },
-      //     {
-      //       subTitle: "Error 504",
-      //       subUrl: "/error-504",
-      //     },
-      //   ],
-      // },
+      {
+        title: "Vendas",
+        hasSub: true,
+        icon: "ti ti-receipt",
+        url: "#",
+        subLinks: [
+          {
+            subTitle: "Cadastrar Venda Direta",
+            subUrl: "/create-sale",
+          },
+        ],
+      },
       {
         title: "Usuarios",
         hasSub: true,
@@ -690,100 +606,8 @@ const navData = [
           },
         ],
       },
-      // {
-      //   title: "Additional",
-      //   hasSub: true,
-      //   icon: "ti ti-basket-dollar",
-      //   url: "#",
-      //   subLinks: [
-      //     {
-      //       subTitle: "Coming Soon 01",
-      //       subUrl: "/coming-soon",
-      //     },
-      //     {
-      //       subTitle: "Coming Soon 02",
-      //       subUrl: "/coming-soon-2",
-      //     },
-      //     {
-      //       subTitle: "Pricing Table 01",
-      //       subUrl: "/pricing-table",
-      //     },
-      //     {
-      //       subTitle: "Pricing Table 02",
-      //       subUrl: "/pricing-table-2",
-      //     },
-      //     {
-      //       subTitle: "Under Construction",
-      //       subUrl: "/under-construction",
-      //     },
-      //   ],
-      // },
-      // {
-      //   url: "/utility",
-      //   title: "Utility",
-      //   icon: "ti ti-calendar-month",
-      // },
     ],
   },
-  // {
-  //   category: "components",
-  //   links: [
-  //     {
-  //       title: "Advance UI",
-  //       hasSub: true,
-  //       icon: "ti ti-components",
-  //       url: "#",
-  //       subLinks: [
-  //         {
-  //           subTitle: "Sweet Alert",
-  //           subUrl: "/sweet-alert",
-  //         },
-  //         {
-  //           subTitle: "Nestable List",
-  //           subUrl: "/nestable-list",
-  //         },
-  //         {
-  //           subTitle: "Animation",
-  //           subUrl: "/animation",
-  //         },
-  //         {
-  //           subTitle: "Swiper Slider",
-  //           subUrl: "/swiper-slider",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       url: "/form",
-  //       title: "Forms",
-  //       icon: "ti ti-forms",
-  //     },
-  //     {
-  //       url: "/table",
-  //       title: "Tables",
-  //       icon: "ti ti-table",
-  //     },
-  //     {
-  //       url: "/charts",
-  //       title: "Charts",
-  //       icon: "ti ti-chart-bar",
-  //     },
-  //     {
-  //       url: "/icon",
-  //       title: "Icons",
-  //       icon: "ti ti-icons",
-  //     },
-  //     {
-  //       url: "/map",
-  //       title: "Maps",
-  //       icon: "ti ti-map-pin",
-  //     },
-  //     {
-  //       url: "/file-manager",
-  //       title: "File Manager",
-  //       icon: "ti ti-file-text",
-  //     },
-  //   ],
-  // },
 ];
 
 const callTableData = [
