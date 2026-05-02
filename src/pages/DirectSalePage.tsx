@@ -117,7 +117,7 @@ const DirectSalePage = () => {
         {
           params: {
             page: 0,
-            size: 1,
+            size: 4,
             name: name?.trim() ? name.trim() : undefined,
           },
         },
