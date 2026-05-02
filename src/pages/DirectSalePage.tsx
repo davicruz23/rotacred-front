@@ -74,8 +74,8 @@ const DirectSalePage = () => {
     [],
   );
 
-//   const [sellerId, setSellerId] = useState("");
-//   const [chargingId, setChargingId] = useState("");
+  //   const [sellerId, setSellerId] = useState("");
+  //   const [chargingId, setChargingId] = useState("");
 
   const [paymentMethod, setPaymentMethod] = useState("PARCEL");
   const [installments, setInstallments] = useState(1);
@@ -175,6 +175,10 @@ const DirectSalePage = () => {
   const getProductName = (product: any) => {
     return product.name ?? product.description ?? `Produto ${product.id}`;
   };
+
+  const getProductQuantity = (product: any) => {
+    return product.amount ?? product.amount ?? `Produto ${product.id}`;
+  }
 
   const handleAddProduct = (product: AllProductDataType) => {
     const productId = Number((product as any).id);
@@ -522,6 +526,7 @@ const DirectSalePage = () => {
                         <tr>
                           <th>Produto</th>
                           <th>Valor</th>
+                          <th>Disponível</th>
                           <th className="text-end">Ação</th>
                         </tr>
                       </thead>
@@ -549,6 +554,7 @@ const DirectSalePage = () => {
                                   },
                                 )}
                               </td>
+                              <td>{getProductQuantity(product)}</td>
                               <td className="text-end">
                                 <button
                                   type="button"
