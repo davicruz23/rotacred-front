@@ -148,7 +148,7 @@ const AllProductPage = () => {
                   <small className="text-muted">
                     {searchName?.trim()
                       ? `Filtrando por: "${searchName}"`
-                      : "Digite algo para pesquisar"}
+                      : ""}
                   </small>
                 </div>
               </div>
