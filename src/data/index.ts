@@ -585,6 +585,10 @@ const navData = [
         url: "#",
         subLinks: [
           {
+            subTitle: "Listar Vendas",
+            subUrl: "/sales-list",
+          },
+          {
             subTitle: "Cadastrar Venda Direta",
             subUrl: "/create-sale",
           },

@@ -19,7 +19,9 @@ type GroupedType = {
 };
 
 const AddCitiesByCollectorPage = () => {
-  const [collectorList, setCollectorList] = useState<{ id: number; collectorName: string }[]>([]);
+  const [collectorList, setCollectorList] = useState<
+    { id: number; collectorName: string }[]
+  >([]);
   const [groupedSales, setGroupedSales] = useState<GroupedType[]>([]);
   const [selectedCollector, setSelectedCollector] = useState("");
   const [selectedSales, setSelectedSales] = useState<number[]>([]);
@@ -42,8 +44,23 @@ const AddCitiesByCollectorPage = () => {
 
   const toggleSale = (id: number) => {
     setSelectedSales((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
+  };
+
+  const toggleCitySales = (sales: SaleType[]) => {
+    const citySaleIds = sales.map((sale) => sale.id);
+
+    const allSelected = citySaleIds.every((id) => selectedSales.includes(id));
+
+    setSelectedSales((prev) => {
+      if (allSelected) {
+        return prev.filter((id) => !citySaleIds.includes(id));
+      }
+
+      const newIds = citySaleIds.filter((id) => !prev.includes(id));
+      return [...prev, ...newIds];
+    });
   };
 
   const handleAssign = async () => {
@@ -64,7 +81,6 @@ const AddCitiesByCollectorPage = () => {
       setSelectedCollector("");
 
       fetchGroupedSales();
-
     } catch (err: any) {
       if (err?.response?.status === 404) {
         navigate("/error-404", { replace: true });
@@ -78,7 +94,10 @@ const AddCitiesByCollectorPage = () => {
 
   return (
     <div className="container-fluid px-1 my-1">
-      <BreadcrumbSection title="Atribuir Cobranças ao Cobrador" link="/inicio" />
+      <BreadcrumbSection
+        title="Atribuir Cobranças ao Cobrador"
+        link="/inicio"
+      />
 
       <div className="card shadow-sm p-4 mb-4">
         <h4 className="mb-3">Selecione o cobrador</h4>
@@ -100,7 +119,6 @@ const AddCitiesByCollectorPage = () => {
       <div className="accordion" id="accordionCities">
         {groupedSales.map((group, index) => (
           <div className="accordion-item" key={group.city}>
-
             <h2 className="accordion-header">
               <button
                 className="accordion-button collapsed"
@@ -108,7 +126,24 @@ const AddCitiesByCollectorPage = () => {
                 data-bs-toggle="collapse"
                 data-bs-target={`#collapse-${index}`}
               >
-                {group.city} ({group.totalSales})
+                <span className="flex-grow-1">
+                  {group.city} ({group.totalSales})
+                </span>
+
+                <div
+                  className="d-flex align-items-center gap-2 me-4"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="small">Selecionar todas</span>
+
+                  <input
+                    type="checkbox"
+                    checked={group.sales.every((sale) =>
+                      selectedSales.includes(sale.id),
+                    )}
+                    onChange={() => toggleCitySales(group.sales)}
+                  />
+                </div>
               </button>
             </h2>
 
@@ -118,15 +153,26 @@ const AddCitiesByCollectorPage = () => {
               data-bs-parent="#accordionCities"
             >
               <div className="accordion-body">
-
                 <table className="table table-bordered">
                   <thead>
                     <tr>
                       <th>Cliente</th>
                       <th>Valor</th>
-                      <th className="text-end">Selecionar</th>
+                      <th className="text-end">
+                        <div className="d-flex justify-content-end align-items-center gap-2">
+                          <span>Selecionar todos</span>
+                          <input
+                            type="checkbox"
+                            checked={group.sales.every((sale) =>
+                              selectedSales.includes(sale.id),
+                            )}
+                            onChange={() => toggleCitySales(group.sales)}
+                          />
+                        </div>
+                      </th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {group.sales.map((sale) => (
                       <tr key={sale.id}>
@@ -143,10 +189,8 @@ const AddCitiesByCollectorPage = () => {
                     ))}
                   </tbody>
                 </table>
-
               </div>
             </div>
-
           </div>
         ))}
       </div>

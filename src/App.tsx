@@ -41,6 +41,7 @@ import CreateSaleReturn from "./pages/CreateSaleReturn";
 import UpdateSaleReturn from "./pages/UpdateSaleReturn";
 import CommissionHistory from "./pages/CommissionHistoryPage";
 import DirectSalePage from "./pages/DirectSalePage";
+import SalesListPage from "./pages/SalesList";
 
 function App() {
   const activeLayout = useAppSelector((state) => state.layout.isLayout);
@@ -103,6 +104,7 @@ function App() {
                 <Route path="/create-sale-return" element={<CreateSaleReturn/>} />
                 <Route path="/update-sale-status" element={<UpdateSaleReturn/>} />
                 <Route path="/create-sale" element={<DirectSalePage/>} />
+                <Route path="/sales-list" element={<SalesListPage/>} />
               </Route>
             </Route>
           </Route>
