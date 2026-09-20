@@ -38,6 +38,26 @@ type ClientSearchData = {
   phone?: string;
 };
 
+type ChargingItem = {
+  id: number;
+  productId: number;
+  chargingId: number;
+  quantity: number;
+  nameProduct: string;
+  brand: string;
+  priceProduct: number;
+  status: number;
+};
+
+type Charging = {
+  id: number;
+  chargingDate: string;
+  userName: string;
+  description: string;
+  data: string;
+  chargingItems: ChargingItem[];
+};
+
 const BRAZIL_STATES = [
   // { value: "", label: "SELECIONE" },
   { value: "AC", label: "Acre" },
@@ -84,7 +104,7 @@ const normalizeState = (value: string | null | undefined): string => {
 };
 
 const STORE_AND_APPROVE_ENDPOINT = "/sale/store-and-approve";
-const PRODUCTS_ENDPOINT = "/product/all";
+const PRODUCTS_ENDPOINT = "/charging/all";
 const CPF_VALIDATOR = "/cpf/validar";
 const CLIENT_SEARCH_ENDPOINT = "/client/search";
 
@@ -336,11 +356,13 @@ const DirectSalePage = () => {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [saving, setSaving] = useState(false);
   const [searchName, setSearchName] = useState("");
-  const [products, setProducts] = useState<AllProductDataType[]>([]);
+  const [products, setProducts] = useState<ChargingItem[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(
     [],
   );
 
+  const [useCurrentDate, setUseCurrentDate] = useState(true);
+  const [saleDate, setSaleDate] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [installments, setInstallments] = useState(1);
   const [cashPaid, setCashPaid] = useState(0);
@@ -407,7 +429,8 @@ const DirectSalePage = () => {
   const fetchProducts = async (name = searchName) => {
     try {
       setLoadingProducts(true);
-      const response = await api.get<PageResponse<AllProductDataType>>(
+
+      const response = await api.get<PageResponse<Charging>>(
         PRODUCTS_ENDPOINT,
         {
           params: {
@@ -417,8 +440,16 @@ const DirectSalePage = () => {
           },
         },
       );
-      if (response.status === 200) setProducts(response.data.content);
-      else alert("Erro ao carregar produtos");
+
+      if (response.status === 200) {
+        const chargingItems = response.data.content.flatMap(
+          (charging) => charging.chargingItems ?? [],
+        );
+
+        setProducts(chargingItems);
+      } else {
+        alert("Erro ao carregar produtos");
+      }
     } catch (error: any) {
       console.error(error);
       alert("Erro ao conectar com o servidor");
@@ -502,24 +533,27 @@ const DirectSalePage = () => {
       address: { ...prev.address, [field]: value },
     }));
 
-  const getProductValue = (product: any) =>
-    Number(product.value ?? product.price ?? product.saleValue ?? 0);
+  const getProductValue = (product: ChargingItem) =>
+    Number(product.priceProduct ?? 0);
 
-  const getProductName = (product: any) =>
-    product.name ?? product.description ?? `Produto ${product.id}`;
+  const getProductName = (product: ChargingItem) =>
+    product.nameProduct ?? `Produto ${product.productId}`;
 
-  const getProductQuantity = (product: any) =>
-    product.amount ?? product.amount ?? `Produto ${product.id}`;
+  const getProductQuantity = (product: ChargingItem) =>
+    Number(product.quantity ?? 0);
 
-  const handleAddProduct = (product: AllProductDataType) => {
-    const productId = Number((product as any).id);
+  const handleAddProduct = (product: ChargingItem) => {
+    const productId = Number(product.productId);
+
     if (!productId) {
       alert("Produto sem ID válido");
       return;
     }
+
     const alreadyExists = selectedProducts.some(
       (item) => item.productId === productId,
     );
+
     if (alreadyExists) {
       setSelectedProducts((prev) =>
         prev.map((item) =>
@@ -528,8 +562,10 @@ const DirectSalePage = () => {
             : item,
         ),
       );
+
       return;
     }
+
     setSelectedProducts((prev) => [
       ...prev,
       {
@@ -588,6 +624,20 @@ const DirectSalePage = () => {
     }
   }
 
+  const getLocalDate = () => {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const effectiveSaleDate = useCurrentDate
+    ? getLocalDate()
+    : saleDate;
+
   const handleSubmit = async () => {
     if (!isFormValid) {
       alert("Preencha todos os campos obrigatórios.");
@@ -601,23 +651,38 @@ const DirectSalePage = () => {
         return;
       }
     }
-
+    
     const payload = {
       preSale: {
         uuidPreSale: crypto.randomUUID(),
-        preSaleDate: new Date().toISOString().substring(0, 10),
+
+        // A pré-venda deve possuir a mesma data efetiva da venda.
+        preSaleDate: effectiveSaleDate,
+
         sellerId: Number(3),
         chargingId: Number(1),
         clientId: selectedClientId,
-        client: selectedClientId ? null : client,
+
+        client: selectedClientId
+          ? null
+          : {
+            ...client,
+            cpf: client.cpf.replace(/\D/g, ""),
+          },
+
         products: selectedProducts.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
         })),
       },
+
       paymentMethod,
       installments: Number(installments),
       cashPaid: Number(cashPaid),
+
+      // null mantém no backend o comportamento de utilizar a data atual.
+      saleDate: useCurrentDate ? null : saleDate,
+
       latitude: Number(latitude),
       longitude: Number(longitude),
     };
@@ -691,7 +756,7 @@ const DirectSalePage = () => {
           city: data.city ?? data.localidade ?? prev.address.city,
 
           state: normalizeState(data.state || data.uf),
-          
+
           complement:
             data.complement ??
             data.complemento ??
@@ -1250,10 +1315,55 @@ const DirectSalePage = () => {
             <div style={S.cardHead}>
               <div style={S.cardTitle}>Pagamento</div>
             </div>
+
             <div style={S.cardBody}>
               <div style={S.grid3}>
+                {/* Data da venda */}
+                <div style={S.field}>
+                  <label style={S.label}>Data da venda</label>
+
+                  <input
+                    style={S.input}
+                    type="date"
+                    value={useCurrentDate ? "" : saleDate}
+                    disabled={useCurrentDate}
+                    required={!useCurrentDate}
+                    max={new Date().toISOString().substring(0, 10)}
+                    onChange={(e) => setSaleDate(e.target.value)}
+                  />
+
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginTop: 8,
+                      cursor: "pointer",
+                      fontSize: 13,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={useCurrentDate}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+
+                        setUseCurrentDate(checked);
+
+                        if (checked) {
+                          setSaleDate("");
+                        }
+                      }}
+                    />
+
+                    Usar data atual
+                  </label>
+                </div>
+
+                {/* Forma de pagamento */}
                 <div style={S.field}>
                   <label style={S.label}>Forma de pagamento</label>
+
                   <select
                     style={S.select}
                     value={paymentMethod}
@@ -1271,8 +1381,11 @@ const DirectSalePage = () => {
                     <option value="PIX">Pix</option>
                   </select>
                 </div>
+
+                {/* Parcelas */}
                 <div style={S.field}>
                   <label style={S.label}>Parcelas</label>
+
                   <input
                     style={S.input}
                     type="number"
@@ -1281,8 +1394,11 @@ const DirectSalePage = () => {
                     onChange={(e) => setInstallments(Number(e.target.value))}
                   />
                 </div>
+
+                {/* Valor pago */}
                 <div style={S.field}>
                   <label style={S.label}>Valor pago na hora</label>
+
                   <input
                     style={S.input}
                     type="number"
@@ -1299,8 +1415,10 @@ const DirectSalePage = () => {
                   <div style={S.summaryLabel}>Total da venda</div>
                   <div style={S.summaryValue}>{brl(totalSale)}</div>
                 </div>
+
                 <div style={S.summaryCard}>
                   <div style={S.summaryLabel}>Valor restante</div>
+
                   <div
                     style={{
                       ...S.summaryValue,
@@ -1310,10 +1428,19 @@ const DirectSalePage = () => {
                     {brl(remainingValue)}
                   </div>
                 </div>
+
                 <button
-                  style={getSaveBtn(saving || !isFormValid)}
+                  style={getSaveBtn(
+                    saving ||
+                    !isFormValid ||
+                    (!useCurrentDate && !saleDate)
+                  )}
                   type="button"
-                  disabled={saving || !isFormValid}
+                  disabled={
+                    saving ||
+                    !isFormValid ||
+                    (!useCurrentDate && !saleDate)
+                  }
                   onClick={handleSubmit}
                 >
                   {saving ? (
