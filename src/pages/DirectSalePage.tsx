@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
-import { AllProductDataType } from "../types";
 
 type PageResponse<T> = {
   content: T[];
@@ -651,7 +650,7 @@ const DirectSalePage = () => {
         return;
       }
     }
-    
+
     const payload = {
       preSale: {
         uuidPreSale: crypto.randomUUID(),
