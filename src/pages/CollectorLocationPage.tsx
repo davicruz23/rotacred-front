@@ -406,6 +406,11 @@ const ordenarPontos = (points: ChargePointDTO[]) =>
     (a, b) => new Date(a.capturedAt).getTime() - new Date(b.capturedAt).getTime(),
   );
 
+const criarParametrosPeriodo = (start: string, end: string) => ({
+  ...(start ? { start } : {}),
+  ...(end ? { end } : {}),
+});
+
 const criarIconeNumerado = (color: string, number: number) => {
   const green = color === "GREEN";
   const red = color === "RED";
@@ -424,13 +429,11 @@ const criarIconeNumerado = (color: string, number: number) => {
 
 function CollectorLocationPage() {
   const navigate = useNavigate();
-  const dataAtual = new Date();
-  const hoje = [dataAtual.getFullYear(), String(dataAtual.getMonth() + 1).padStart(2, "0"), String(dataAtual.getDate()).padStart(2, "0")].join("-");
   const [collectors, setCollectors] = useState<CollectorDTO[]>([]);
   const [selectedCollector, setSelectedCollector] = useState<CollectorDTO | null>(null);
   const [route, setRoute] = useState<CollectorRouteDTO | null>(null);
-  const [startDate, setStartDate] = useState(hoje);
-  const [endDate, setEndDate] = useState(hoje);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [loadingCollectors, setLoadingCollectors] = useState(true);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [error, setError] = useState("");
@@ -454,8 +457,7 @@ function CollectorLocationPage() {
   }, []);
 
   const buscarRota = useCallback(async (collector: CollectorDTO) => {
-    if (!startDate || !endDate) return;
-    if (startDate > endDate) {
+    if (startDate && endDate && startDate > endDate) {
       setError("Período inválido: a data inicial deve ser anterior ou igual à data final.");
       return;
     }
@@ -464,7 +466,7 @@ function CollectorLocationPage() {
       setError("");
       const response = await api.get<CollectorRouteDTO>(
         `/tracking/collectors/${collector.userId}/route`,
-        { params: { start: startDate, end: endDate } },
+        { params: criarParametrosPeriodo(startDate, endDate) },
       );
       setRoute({
         ...response.data,
@@ -479,7 +481,7 @@ function CollectorLocationPage() {
   }, [endDate, startDate]);
 
   const buscarAtividade = useCallback(async (collector: CollectorDTO) => {
-    if (!startDate || !endDate || startDate > endDate) return;
+    if (startDate && endDate && startDate > endDate) return;
 
     const periodKey = `${startDate}:${endDate}`;
     const cachedActivity = activityByCollector[collector.userId];
@@ -490,7 +492,7 @@ function CollectorLocationPage() {
       setError("");
       const response = await api.get<CollectorRouteDTO>(
         `/tracking/collectors/${collector.userId}/route`,
-        { params: { start: startDate, end: endDate } },
+        { params: criarParametrosPeriodo(startDate, endDate) },
       );
       setActivityByCollector((previous) => ({
         ...previous,
@@ -580,6 +582,15 @@ function CollectorLocationPage() {
   const formatarDataFiltro = (data: string) => {
     const [ano, mes, dia] = data.split("-");
     return ano && mes && dia ? `${dia}/${mes}/${ano}` : data;
+  };
+
+  const formatarPeriodo = () => {
+    if (!startDate && !endDate) return "Todos os períodos";
+    if (startDate && endDate) {
+      return `${formatarDataFiltro(startDate)} a ${formatarDataFiltro(endDate)}`;
+    }
+    if (startDate) return `A partir de ${formatarDataFiltro(startDate)}`;
+    return `Até ${formatarDataFiltro(endDate)}`;
   };
 
   const statusCobranca = (status: string) => {
@@ -713,9 +724,7 @@ function CollectorLocationPage() {
                   <div>
                     <div style={S.infoLabel}>Período consultado</div>
                     <div style={S.infoValue}>
-                      {startDate && endDate
-                        ? `${formatarDataFiltro(startDate)} a ${formatarDataFiltro(endDate)}`
-                        : "Nenhuma localização registrada"}
+                      {formatarPeriodo()}
                     </div>
                   </div>
                 </div>
@@ -929,7 +938,7 @@ function CollectorLocationPage() {
 
                 <div style={S.sideItem}>
                   <div style={S.sideLabel}>Período</div>
-                  <div style={S.sideValueSm}>{startDate} a {endDate}</div>
+                  <div style={S.sideValueSm}>{formatarPeriodo()}</div>
                 </div>
 
                 <div style={S.sideItem}>
