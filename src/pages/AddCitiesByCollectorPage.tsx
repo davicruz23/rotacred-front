@@ -25,6 +25,7 @@ const AddCitiesByCollectorPage = () => {
   const [groupedSales, setGroupedSales] = useState<GroupedType[]>([]);
   const [selectedCollector, setSelectedCollector] = useState("");
   const [selectedSales, setSelectedSales] = useState<number[]>([]);
+  const [openCity, setOpenCity] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const fetchGroupedSales = async () => {
@@ -63,6 +64,10 @@ const AddCitiesByCollectorPage = () => {
     });
   };
 
+  const toggleCity = (city: string) => {
+    setOpenCity((previous) => (previous === city ? null : city));
+  };
+
   const handleAssign = async () => {
     if (!selectedCollector || selectedSales.length === 0) {
       alert("Selecione o cobrador e as Vendas.");
@@ -81,8 +86,13 @@ const AddCitiesByCollectorPage = () => {
       setSelectedCollector("");
 
       fetchGroupedSales();
-    } catch (err: any) {
-      if (err?.response?.status === 404) {
+    } catch (err: unknown) {
+      const status =
+        typeof err === "object" && err !== null && "response" in err
+          ? (err as { response?: { status?: number } }).response?.status
+          : undefined;
+
+      if (status === 404) {
         navigate("/error-404", { replace: true });
         return;
       }
@@ -119,38 +129,36 @@ const AddCitiesByCollectorPage = () => {
       <div className="accordion" id="accordionCities">
         {groupedSales.map((group, index) => (
           <div className="accordion-item" key={group.city}>
-            <h2 className="accordion-header">
+            <h2 className="accordion-header d-flex align-items-center">
               <button
-                className="accordion-button collapsed"
+                className={`accordion-button ${openCity === group.city ? "" : "collapsed"}`}
                 type="button"
-                data-bs-toggle="collapse"
-                data-bs-target={`#collapse-${index}`}
+                aria-expanded={openCity === group.city}
+                onClick={() => toggleCity(group.city)}
+                style={{ flex: 1 }}
               >
                 <span className="flex-grow-1">
                   {group.city} ({group.totalSales})
                 </span>
-
-                <div
-                  className="d-flex align-items-center gap-2 me-4"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span className="small">Selecionar todas</span>
-
-                  <input
-                    type="checkbox"
-                    checked={group.sales.every((sale) =>
-                      selectedSales.includes(sale.id),
-                    )}
-                    onChange={() => toggleCitySales(group.sales)}
-                  />
-                </div>
               </button>
+
+              <div className="d-flex align-items-center gap-2 px-3">
+                <span className="small"></span>
+
+                <input
+                  type="checkbox"
+                  checked={group.sales.every((sale) =>
+                    selectedSales.includes(sale.id),
+                  )}
+                  onChange={() => toggleCitySales(group.sales)}
+                />
+              </div>
             </h2>
 
             <div
               id={`collapse-${index}`}
-              className="accordion-collapse collapse"
-              data-bs-parent="#accordionCities"
+              className="accordion-collapse"
+              style={{ display: openCity === group.city ? "block" : "none" }}
             >
               <div className="accordion-body">
                 <table className="table table-bordered">

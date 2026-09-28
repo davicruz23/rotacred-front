@@ -1,38 +1,45 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CircleMarker,
   MapContainer,
-  Polyline,
   Popup,
   TileLayer,
+  Tooltip,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
 
-interface CollectorTrackingDTO {
+interface CollectorDTO {
   collectorId: number;
   userId: number;
   collectorName: string;
-  latitude: number | null;
-  longitude: number | null;
-  lastLocationAt: string | null;
-  online: boolean;
 }
 
-interface LocationPointDTO {
-  id: number;
+interface ChargePointDTO {
+  installmentId: number | string;
+  saleId: number | string;
   latitude: number;
   longitude: number;
   capturedAt: string;
+  status: "PAID" | "NOT_PAID" | string;
+  color: "GREEN" | "RED" | string;
+  withinRadius: boolean;
+  amount: number;
 }
 
 interface CollectorRouteDTO {
   collectorId: number;
   userId: number;
   collectorName: string;
-  points: LocationPointDTO[];
+  points: ChargePointDTO[];
+}
+
+interface CollectorActivityDTO {
+  periodKey: string;
+  points: ChargePointDTO[];
 }
 
 /* ── estilos ── */
@@ -383,63 +390,99 @@ const S: Record<string, React.CSSProperties> = {
   },
 };
 
-const getOnlineBadge = (online: boolean): React.CSSProperties => ({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 5,
-  padding: "4px 12px",
-  borderRadius: 999,
-  fontSize: 13,
-  fontWeight: 600,
-  background: online ? "#EAF3DE" : "#F1EFE8",
-  color: online ? "#3B6D11" : "#5F5E5A",
-  flexShrink: 0,
-});
-
 const getInitials = (name: string) =>
   name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error !== "object" || error === null) return fallback;
+  const response = (error as { response?: { data?: { message?: string } } }).response;
+  return response?.data?.message ?? fallback;
+};
 
 /* ── componente ── */
 
 function CollectorLocationPage() {
-  const [collectors, setCollectors] = useState<CollectorTrackingDTO[]>([]);
-  const [selectedCollector, setSelectedCollector] = useState<CollectorTrackingDTO | null>(null);
+  const navigate = useNavigate();
+  const dataAtual = new Date();
+  const hoje = [dataAtual.getFullYear(), String(dataAtual.getMonth() + 1).padStart(2, "0"), String(dataAtual.getDate()).padStart(2, "0")].join("-");
+  const [collectors, setCollectors] = useState<CollectorDTO[]>([]);
+  const [selectedCollector, setSelectedCollector] = useState<CollectorDTO | null>(null);
   const [route, setRoute] = useState<CollectorRouteDTO | null>(null);
+  const [startDate, setStartDate] = useState(hoje);
+  const [endDate, setEndDate] = useState(hoje);
   const [loadingCollectors, setLoadingCollectors] = useState(true);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [error, setError] = useState("");
+  const [expandedCollectorId, setExpandedCollectorId] = useState<number | null>(null);
+  const [loadingActivityCollectorId, setLoadingActivityCollectorId] = useState<number | null>(null);
+  const [activityByCollector, setActivityByCollector] = useState<Record<number, CollectorActivityDTO>>({});
+  const [hoveredPointKey, setHoveredPointKey] = useState<string | null>(null);
+  const tooltipCloseTimer = useRef<number | null>(null);
 
-  const buscarCollectors = async () => {
+  const buscarCollectors = useCallback(async () => {
     try {
       setError("");
-      const response = await api.get<CollectorTrackingDTO[]>("/tracking/collectors");
+      const response = await api.get<CollectorDTO[]>("/tracking/collectors");
       setCollectors(response.data ?? []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erro ao buscar cobradores:", error);
-      setError(error.response?.data?.message ?? "Não foi possível carregar os cobradores.");
+      setError(getApiErrorMessage(error, "Não foi possível carregar os cobradores."));
     } finally {
       setLoadingCollectors(false);
     }
-  };
+  }, []);
 
-  const buscarRota = async (collector: CollectorTrackingDTO, mostrarCarregamento = true) => {
-    try {
-      if (mostrarCarregamento) setLoadingRoute(true);
-      setError("");
-      const response = await api.get<CollectorRouteDTO>(`/tracking/collectors/${collector.userId}/route`);
-      setRoute(response.data);
-    } catch (error: any) {
-      console.error("Erro ao buscar rota:", error);
-      setError(error.response?.data?.message ?? "Não foi possível carregar a rota do cobrador.");
-    } finally {
-      if (mostrarCarregamento) setLoadingRoute(false);
+  const buscarRota = useCallback(async (collector: CollectorDTO) => {
+    if (!startDate || !endDate) return;
+    if (startDate > endDate) {
+      setError("Período inválido: a data inicial deve ser anterior ou igual à data final.");
+      return;
     }
-  };
+    try {
+      setLoadingRoute(true);
+      setError("");
+      const response = await api.get<CollectorRouteDTO>(
+        `/tracking/collectors/${collector.userId}/route`,
+        { params: { start: startDate, end: endDate } },
+      );
+      setRoute(response.data);
+    } catch (error: unknown) {
+      console.error("Erro ao buscar rota:", error);
+      setError(getApiErrorMessage(error, "Não foi possível carregar as cobranças do cobrador."));
+    } finally {
+      setLoadingRoute(false);
+    }
+  }, [endDate, startDate]);
 
-  const selecionarCollector = async (collector: CollectorTrackingDTO) => {
+  const buscarAtividade = useCallback(async (collector: CollectorDTO) => {
+    if (!startDate || !endDate || startDate > endDate) return;
+
+    const periodKey = `${startDate}:${endDate}`;
+    const cachedActivity = activityByCollector[collector.userId];
+    if (cachedActivity?.periodKey === periodKey) return;
+
+    try {
+      setLoadingActivityCollectorId(collector.userId);
+      setError("");
+      const response = await api.get<CollectorRouteDTO>(
+        `/tracking/collectors/${collector.userId}/route`,
+        { params: { start: startDate, end: endDate } },
+      );
+      setActivityByCollector((previous) => ({
+        ...previous,
+        [collector.userId]: { periodKey, points: response.data?.points ?? [] },
+      }));
+    } catch (error: unknown) {
+      console.error("Erro ao buscar atividade do cobrador:", error);
+      setError(getApiErrorMessage(error, "Não foi possível carregar a atividade do cobrador."));
+    } finally {
+      setLoadingActivityCollectorId(null);
+    }
+  }, [activityByCollector, endDate, startDate]);
+
+  const selecionarCollector = (collector: CollectorDTO) => {
     setSelectedCollector(collector);
     setRoute(null);
-    await buscarRota(collector);
   };
 
   const fecharMapa = () => {
@@ -448,21 +491,39 @@ function CollectorLocationPage() {
     setError("");
   };
 
+  const alternarAtividade = (collector: CollectorDTO) => {
+    setExpandedCollectorId((previous) =>
+      previous === collector.userId ? null : collector.userId,
+    );
+  };
+
+  const abrirMapaComAtividade = (collector: CollectorDTO, points: ChargePointDTO[]) => {
+    setSelectedCollector(collector);
+    setRoute({
+      collectorId: collector.collectorId,
+      userId: collector.userId,
+      collectorName: collector.collectorName,
+      points,
+    });
+  };
+
   useEffect(() => {
-    buscarCollectors();
-    const interval = setInterval(() => buscarCollectors(), 10000);
-    return () => clearInterval(interval);
-  }, []);
+    void buscarCollectors();
+  }, [buscarCollectors]);
 
   useEffect(() => {
     if (!selectedCollector) return;
-    const interval = setInterval(() => buscarRota(selectedCollector, false), 10000);
-    return () => clearInterval(interval);
-  }, [selectedCollector]);
+    if (route?.userId === selectedCollector.userId) return;
+    void buscarRota(selectedCollector);
+  }, [buscarRota, route?.userId, selectedCollector]);
+
+  useEffect(() => {
+    if (expandedCollectorId === null) return;
+    const collector = collectors.find((item) => item.userId === expandedCollectorId);
+    if (collector) void buscarAtividade(collector);
+  }, [buscarAtividade, collectors, expandedCollectorId]);
 
   const pontos = route?.points ?? [];
-  const coordenadas: [number, number][] = pontos.map((p) => [p.latitude, p.longitude]);
-  const primeiroPonto = pontos.length > 0 ? pontos[0] : null;
   const ultimoPonto = pontos.length > 0 ? pontos[pontos.length - 1] : null;
 
   const formatarData = (data: string | null | undefined) => {
@@ -470,7 +531,7 @@ function CollectorLocationPage() {
     return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "medium" }).format(new Date(data));
   };
 
-  function AjustarMapa({ pontos }: { pontos: LocationPointDTO[] }) {
+  function AjustarMapa({ pontos }: { pontos: ChargePointDTO[] }) {
     const map = useMap();
     useEffect(() => {
       if (pontos.length === 0) return;
@@ -485,14 +546,58 @@ function CollectorLocationPage() {
     return null;
   }
 
-  const formatarUltimaAtualizacao = (data: string | null | undefined) => {
-    if (!data) return "Nenhuma localização registrada";
-    const diff = Math.floor((new Date().getTime() - new Date(data).getTime()) / 1000);
-    if (diff < 60) return "Atualizado agora";
-    const mins = Math.floor(diff / 60);
-    if (mins === 1) return "Atualizado há 1 minuto";
-    if (mins < 60) return `Atualizado há ${mins} minutos`;
-    return formatarData(data);
+  const formatarValor = (amount: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(amount ?? 0);
+
+  const formatarDataFiltro = (data: string) => {
+    const [ano, mes, dia] = data.split("-");
+    return ano && mes && dia ? `${dia}/${mes}/${ano}` : data;
+  };
+
+  const statusCobranca = (status: string) => {
+    if (status === "PAID") return "Cobrança registrada como paga";
+    if (status === "NOT_PAID") return "Tentativa sem pagamento";
+    return status;
+  };
+
+  const raioCobranca = (withinRadius: boolean) =>
+    withinRadius ? "Dentro do raio permitido" : "Fora do raio permitido ou cobrança não validada";
+
+  const estiloMarcador = (color: string) => {
+    const green = color === "GREEN";
+    const red = color === "RED";
+    return {
+      color: green ? "#15803d" : red ? "#b91c1c" : "#6b7280",
+      fillColor: green ? "#22c55e" : red ? "#ef4444" : "#9ca3af",
+      fillOpacity: 1,
+      weight: 3,
+    };
+  };
+
+  const abrirCobranca = (ponto: ChargePointDTO) => {
+    const params = new URLSearchParams({
+      saleId: String(ponto.saleId),
+      installmentId: String(ponto.installmentId),
+    });
+    navigate(`/collector-sales?${params.toString()}`);
+  };
+
+  const getPontoKey = (ponto: ChargePointDTO, index: number) =>
+    `${ponto.installmentId}-${ponto.saleId}-${ponto.capturedAt}-${index}`;
+
+  const manterTooltipAberto = () => {
+    if (tooltipCloseTimer.current !== null) {
+      window.clearTimeout(tooltipCloseTimer.current);
+      tooltipCloseTimer.current = null;
+    }
+  };
+
+  const agendarFechamentoTooltip = () => {
+    manterTooltipAberto();
+    tooltipCloseTimer.current = window.setTimeout(() => {
+      setHoveredPointKey(null);
+      tooltipCloseTimer.current = null;
+    }, 250);
   };
 
   return (
@@ -505,8 +610,29 @@ function CollectorLocationPage() {
         </div>
         <div>
           <div style={S.pageTitle}>Acompanhar cobranças</div>
-          <div style={S.pageSub}>Acompanhe a localização e a rota atual dos cobradores.</div>
+          <div style={S.pageSub}>Consulte as cobranças registradas pelos cobradores.</div>
         </div>
+      </div>
+
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "end", gap: 12, marginBottom: 16 }}>
+        <label style={{ display: "flex", flexDirection: "column", gap: 5, fontSize: 12, fontWeight: 600, color: "#334155" }}>
+          Data inicial
+          <input
+            type="date"
+            value={startDate}
+            onChange={(event) => setStartDate(event.target.value)}
+            style={{ border: "1px solid #94a3b8", borderRadius: 7, padding: "8px 10px", color: "#1f2937", backgroundColor: "#fff", fontSize: 13, fontWeight: 500, opacity: 1, WebkitTextFillColor: "#1f2937" }}
+          />
+        </label>
+        <label style={{ display: "flex", flexDirection: "column", gap: 5, fontSize: 12, fontWeight: 600, color: "#334155" }}>
+          Data final
+          <input
+            type="date"
+            value={endDate}
+            onChange={(event) => setEndDate(event.target.value)}
+            style={{ border: "1px solid #94a3b8", borderRadius: 7, padding: "8px 10px", color: "#1f2937", backgroundColor: "#fff", fontSize: 13, fontWeight: 500, opacity: 1, WebkitTextFillColor: "#1f2937" }}
+          />
+        </label>
       </div>
 
       {/* Erro */}
@@ -530,8 +656,14 @@ function CollectorLocationPage() {
 
       ) : (
         <div style={S.grid}>
-          {collectors.map((collector) => (
-            <button
+          {collectors.map((collector) => {
+            const atividade = activityByCollector[collector.userId]?.points ?? [];
+            const atividadeAberta = expandedCollectorId === collector.userId;
+            const carregandoAtividade = loadingActivityCollectorId === collector.userId;
+
+            return (
+              <div key={collector.collectorId} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <button
               key={collector.collectorId}
               type="button"
               style={S.collCard}
@@ -554,34 +686,27 @@ function CollectorLocationPage() {
                     <div style={S.collId}>Cobrador #{collector.collectorId}</div>
                   </div>
                 </div>
-                <span style={getOnlineBadge(collector.online)}>
-                  <span style={{
-                    width: 7, height: 7, borderRadius: "50%",
-                    background: collector.online ? "#3B6D11" : "#aaa",
-                    flexShrink: 0,
-                  }} />
-                  {collector.online ? "Online" : "Offline"}
-                </span>
+                <span style={{ ...S.infoLabel, color: "#185FA5" }}>Ver cobranças</span>
               </div>
 
               {/* Corpo */}
               <div style={S.collBody}>
                 <div style={S.infoRow}>
-                  <i className="ti ti-current-location" style={S.infoIcon} />
+                  <i className="ti ti-calendar" style={S.infoIcon} />
                   <div>
-                    <div style={S.infoLabel}>Última localização</div>
+                    <div style={S.infoLabel}>Período consultado</div>
                     <div style={S.infoValue}>
-                      {collector.latitude != null && collector.longitude != null
-                        ? `${collector.latitude.toFixed(6)}, ${collector.longitude.toFixed(6)}`
+                      {startDate && endDate
+                        ? `${formatarDataFiltro(startDate)} a ${formatarDataFiltro(endDate)}`
                         : "Nenhuma localização registrada"}
                     </div>
                   </div>
                 </div>
                 <div style={S.infoRow}>
-                  <i className="ti ti-clock" style={S.infoIcon} />
+                  <i className="ti ti-user-check" style={S.infoIcon} />
                   <div>
-                    <div style={S.infoLabel}>Atualização</div>
-                    <div style={S.infoValue}>{formatarUltimaAtualizacao(collector.lastLocationAt)}</div>
+                    <div style={S.infoLabel}>Identificação</div>
+                    <div style={S.infoValue}>Cobrador #{collector.collectorId}</div>
                   </div>
                 </div>
               </div>
@@ -591,8 +716,64 @@ function CollectorLocationPage() {
                 <span>Acompanhar rota</span>
                 <i className="ti ti-chevron-right" />
               </div>
-            </button>
-          ))}
+                </button>
+
+                <div style={{ background: "#fff", border: "0.5px solid #e0e0e0", borderRadius: 10, overflow: "hidden" }}>
+                  <button
+                    type="button"
+                    onClick={() => alternarAtividade(collector)}
+                    style={{ width: "100%", border: "none", background: "#f8f9fa", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", color: "#185FA5", fontSize: 13, fontWeight: 600 }}
+                  >
+                    <span>
+                      <i className="ti ti-list-details" style={{ marginRight: 6 }} />
+                      Atividade do cobrador
+                    </span>
+                    <i className={`ti ti-chevron-${atividadeAberta ? "up" : "down"}`} />
+                  </button>
+
+                  {atividadeAberta && (
+                    <div style={{ padding: 10, borderTop: "0.5px solid #e0e0e0" }}>
+                      {carregandoAtividade ? (
+                        <div style={{ padding: "12px 4px", textAlign: "center", color: "#888", fontSize: 12 }}>
+                          <span className="spinner-border spinner-border-sm text-primary me-2" role="status" />
+                          Carregando atividade...
+                        </div>
+                      ) : atividade.length === 0 ? (
+                        <div style={{ padding: "10px 4px", color: "#888", fontSize: 12, textAlign: "center" }}>
+                          Nenhuma cobrança no período selecionado.
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          {atividade.map((ponto, index) => (
+                            <button
+                              key={getPontoKey(ponto, index)}
+                              type="button"
+                              onClick={() => abrirMapaComAtividade(collector, atividade)}
+                              style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: 7, background: "#fff", padding: "8px 9px", display: "flex", alignItems: "center", gap: 8, textAlign: "left", cursor: "pointer" }}
+                            >
+                              <span style={{ width: 10, height: 10, borderRadius: "50%", flexShrink: 0, background: ponto.color === "GREEN" ? "#22c55e" : "#ef4444" }} />
+                              <span style={{ minWidth: 0, flex: 1 }}>
+                                <span style={{ display: "block", color: "#1f2937", fontSize: 12, fontWeight: 600 }}>
+                                  Venda #{ponto.saleId} · {statusCobranca(ponto.status)}
+                                </span>
+                                <span style={{ display: "block", color: "#6b7280", fontSize: 11, marginTop: 2 }}>
+                                  {formatarData(ponto.capturedAt)} · {ponto.withinRadius ? "Dentro do raio" : "Fora do raio"}
+                                </span>
+                              </span>
+                              <span style={{ color: "#1f2937", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" }}>
+                                {formatarValor(ponto.amount)}
+                              </span>
+                              <i className="ti ti-map-2" style={{ color: "#185FA5", fontSize: 16 }} />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -608,7 +789,7 @@ function CollectorLocationPage() {
                   <i className="ti ti-route" />
                 </div>
                 <div>
-                  <div style={S.modalTitle}>Rota de {selectedCollector.collectorName}</div>
+                  <div style={S.modalTitle}>Cobranças de {selectedCollector.collectorName}</div>
                   <div style={S.modalSub}>
                     {pontos.length} ponto{pontos.length !== 1 ? "s" : ""} registrado{pontos.length !== 1 ? "s" : ""}
                   </div>
@@ -627,13 +808,13 @@ function CollectorLocationPage() {
                     <div className="spinner-border text-primary" role="status">
                       <span className="visually-hidden">Carregando...</span>
                     </div>
-                    <span>Carregando rota...</span>
+                    <span>Carregando cobranças...</span>
                   </div>
                 ) : pontos.length === 0 ? (
                   <div style={{ ...S.emptyBox, minHeight: 420, borderRadius: 0, border: "none" }}>
                     <i className="ti ti-map-off" style={{ fontSize: 40 }} />
                     <div style={S.emptyTitle}>Nenhum ponto registrado</div>
-                    <div style={S.emptySub}>Este cobrador ainda não possui uma rota.</div>
+                    <div style={S.emptySub}>Este cobrador ainda não possui cobranças no período.</div>
                   </div>
                 ) : ultimoPonto ? (
                   <MapContainer
@@ -648,25 +829,69 @@ function CollectorLocationPage() {
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
                     <AjustarMapa pontos={pontos} />
-                    {coordenadas.length > 1 && (
-                      <Polyline positions={coordenadas} pathOptions={{ color: "#2563eb", weight: 5, opacity: 0.8 }} />
-                    )}
-                    {primeiroPonto && (
-                      <CircleMarker
-                        center={[primeiroPonto.latitude, primeiroPonto.longitude]}
-                        radius={9}
-                        pathOptions={{ color: "#15803d", fillColor: "#22c55e", fillOpacity: 1, weight: 3 }}
-                      >
-                        <Popup><strong>Início da rota</strong><br />{formatarData(primeiroPonto.capturedAt)}</Popup>
-                      </CircleMarker>
-                    )}
-                    <CircleMarker
-                      center={[ultimoPonto.latitude, ultimoPonto.longitude]}
-                      radius={10}
-                      pathOptions={{ color: "#b91c1c", fillColor: "#ef4444", fillOpacity: 1, weight: 3 }}
-                    >
-                      <Popup><strong>Posição atual</strong><br />{formatarData(ultimoPonto.capturedAt)}</Popup>
-                    </CircleMarker>
+                    {pontos.map((ponto, index) => {
+                      const pontoKey = getPontoKey(ponto, index);
+
+                      return (
+                        <CircleMarker
+                          key={pontoKey}
+                          center={[ponto.latitude, ponto.longitude]}
+                          radius={9}
+                          pathOptions={estiloMarcador(ponto.color)}
+                          eventHandlers={{
+                            mouseover: () => {
+                              manterTooltipAberto();
+                              setHoveredPointKey(pontoKey);
+                            },
+                            mouseout: agendarFechamentoTooltip,
+                          }}
+                        >
+                          {hoveredPointKey === pontoKey && (
+                            <Tooltip permanent direction="top" offset={[0, 0]} interactive>
+                              <div
+                                style={{ minWidth: 180, textAlign: "center" }}
+                                onMouseEnter={manterTooltipAberto}
+                                onMouseLeave={agendarFechamentoTooltip}
+                              >
+                                <div style={{ fontWeight: 700, marginBottom: 4 }}>
+                                  Cobrança da venda #{ponto.saleId}
+                                </div>
+                                <div style={{ marginBottom: 8 }}>
+                                  Deseja ver esta cobrança?
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    abrirCobranca(ponto);
+                                  }}
+                                  style={{
+                                    border: "none",
+                                    borderRadius: 5,
+                                    padding: "5px 9px",
+                                    background: "#185FA5",
+                                    color: "#fff",
+                                    cursor: "pointer",
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Ver cobrança
+                                </button>
+                              </div>
+                            </Tooltip>
+                          )}
+                        <Popup>
+                          <strong>Cobrança</strong><br />
+                          Cobrador: {selectedCollector.collectorName}<br />
+                          Data: {formatarData(ponto.capturedAt)}<br />
+                          Valor: {formatarValor(ponto.amount)}<br />
+                          Status: {statusCobranca(ponto.status)}<br />
+                          Raio: {raioCobranca(ponto.withinRadius)}
+                        </Popup>
+                        </CircleMarker>
+                      );
+                    })}
                   </MapContainer>
                 ) : null}
               </div>
@@ -679,23 +904,17 @@ function CollectorLocationPage() {
                 </div>
 
                 <div style={S.sideItem}>
-                  <div style={S.sideLabel}>Status</div>
-                  <span style={{ ...getOnlineBadge(selectedCollector.online), marginTop: 4 }}>
-                    <span style={{
-                      width: 7, height: 7, borderRadius: "50%",
-                      background: selectedCollector.online ? "#3B6D11" : "#aaa",
-                    }} />
-                    {selectedCollector.online ? "Online" : "Offline"}
-                  </span>
+                  <div style={S.sideLabel}>Período</div>
+                  <div style={S.sideValueSm}>{startDate} a {endDate}</div>
                 </div>
 
                 <div style={S.sideItem}>
-                  <div style={S.sideLabel}>Pontos da rota</div>
+                  <div style={S.sideLabel}>Pontos de cobrança</div>
                   <div style={{ ...S.sideValue, fontSize: 22 }}>{pontos.length}</div>
                 </div>
 
                 <div style={S.sideItem}>
-                  <div style={S.sideLabel}>Última atualização</div>
+                  <div style={S.sideLabel}>Última cobrança</div>
                   <div style={S.sideValueSm}>
                     {ultimoPonto ? formatarData(ultimoPonto.capturedAt) : "Sem localização"}
                   </div>
@@ -703,7 +922,7 @@ function CollectorLocationPage() {
 
                 {ultimoPonto && (
                   <div style={S.sideItem}>
-                    <div style={S.sideLabel}>Coordenadas atuais</div>
+                    <div style={S.sideLabel}>Coordenadas do ponto</div>
                     <div style={S.sideValueSm}>
                       {ultimoPonto.latitude.toFixed(6)}, {ultimoPonto.longitude.toFixed(6)}
                     </div>
@@ -714,10 +933,10 @@ function CollectorLocationPage() {
                   type="button"
                   style={loadingRoute ? S.refreshBtnDisabled : S.refreshBtn}
                   disabled={loadingRoute}
-                  onClick={() => buscarRota(selectedCollector, true)}
+                  onClick={() => void buscarRota(selectedCollector)}
                 >
                   <i className="ti ti-refresh" />
-                  Atualizar rota
+                  Atualizar cobranças
                 </button>
               </aside>
             </div>

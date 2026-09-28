@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import BreadcrumbSection from "../components/breadcrumb/BreadcrumbSection";
 import {
@@ -285,6 +286,7 @@ const S = {
 /* ── componente principal ──────────────────────────────────── */
 
 const ListCollectorSalesPage = () => {
+  const [searchParams] = useSearchParams();
   const [collectorData, setCollectorData] = useState<CollectorType[]>([]);
   const [collectors, setCollectors] = useState<CollectorSimpleType[]>([]);
   const [statusFilter, setStatusFilter] = useState<number>(0);
@@ -293,6 +295,7 @@ const ListCollectorSalesPage = () => {
     useState<PaymentFilterType>("TODOS");
   const [openCollectors, setOpenCollectors] = useState<Set<number>>(new Set());
   const [openSales, setOpenSales] = useState<Set<number>>(new Set());
+  const [highlightedInstallmentId, setHighlightedInstallmentId] = useState<string | null>(null);
 
   const fetchCollectors = async () => {
     try {
@@ -334,6 +337,22 @@ const ListCollectorSalesPage = () => {
   useEffect(() => {
     fetchCollectorsWithSales(statusFilter, collectorFilter, paymentFilter);
   }, [statusFilter, collectorFilter, paymentFilter]);
+
+  useEffect(() => {
+    const saleId = searchParams.get("saleId");
+    const installmentId = searchParams.get("installmentId");
+    if (!saleId || collectorData.length === 0) return;
+
+    const collectorWithSale = collectorData.find((collector) =>
+      collector.sales.some((sale) => String(sale.id) === saleId),
+    );
+    const sale = collectorWithSale?.sales.find((item) => String(item.id) === saleId);
+    if (!collectorWithSale || !sale) return;
+
+    setOpenCollectors((previous) => new Set(previous).add(collectorWithSale.id));
+    setOpenSales((previous) => new Set(previous).add(sale.id));
+    setHighlightedInstallmentId(installmentId);
+  }, [collectorData, searchParams]);
 
   const mapPaymentFilterToParam = (
     filter: PaymentFilterType,
@@ -723,7 +742,18 @@ const ListCollectorSalesPage = () => {
                                   </thead>
                                   <tbody>
                                     {sale.installments.map((inst, index) => (
-                                      <tr key={inst.id}>
+                                      <tr
+                                        key={inst.id}
+                                        style={
+                                          String(inst.id) === highlightedInstallmentId
+                                            ? {
+                                                background: "#E6F1FB",
+                                                outline: "2px solid #185FA5",
+                                                outlineOffset: -2,
+                                              }
+                                            : undefined
+                                        }
+                                      >
                                         <td style={S.td}>{index + 1}</td>
                                         <td style={S.td}>{inst.dueDate}</td>
                                         <td style={S.td}>R$ {inst.amount}</td>

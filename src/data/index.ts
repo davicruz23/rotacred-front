@@ -102,10 +102,10 @@ const navData = [
             subTitle: "Acompanhar Cobradores",
             subUrl: "/collector-location",
           },
-          {
-            subTitle: "Filtrar Por Périodo",
-            subUrl: "/collector-sales",
-          },
+          // {
+          //   subTitle: "Filtrar Por Périodo",
+          //   subUrl: "/collector-sales",
+          // },
         ],
       },
       {
