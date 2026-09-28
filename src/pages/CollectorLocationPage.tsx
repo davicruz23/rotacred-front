@@ -798,7 +798,7 @@ function CollectorLocationPage() {
 
       {/* Modal */}
       {selectedCollector && (
-        <div style={S.overlay} onClick={fecharMapa}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={(e) => e.stopPropagation()}>
 
             {/* Cabeçalho do modal */}
