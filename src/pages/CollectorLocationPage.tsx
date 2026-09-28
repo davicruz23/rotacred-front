@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  CircleMarker,
   MapContainer,
+  Marker,
+  Polyline,
   Popup,
   TileLayer,
   Tooltip,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { divIcon } from "leaflet";
 import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
@@ -399,6 +401,25 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
   return response?.data?.message ?? fallback;
 };
 
+const ordenarPontos = (points: ChargePointDTO[]) =>
+  [...points].sort(
+    (a, b) => new Date(a.capturedAt).getTime() - new Date(b.capturedAt).getTime(),
+  );
+
+const criarIconeNumerado = (color: string, number: number) => {
+  const green = color === "GREEN";
+  const red = color === "RED";
+  const fillColor = green ? "#22c55e" : red ? "#ef4444" : "#9ca3af";
+  const borderColor = green ? "#15803d" : red ? "#b91c1c" : "#6b7280";
+
+  return divIcon({
+    className: "collector-charge-number-icon",
+    html: `<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:3px solid ${borderColor};border-radius:50%;background:${fillColor};color:#fff;font:700 12px Arial,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.35)">${number}</span>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
+};
+
 /* ── componente ── */
 
 function CollectorLocationPage() {
@@ -445,7 +466,10 @@ function CollectorLocationPage() {
         `/tracking/collectors/${collector.userId}/route`,
         { params: { start: startDate, end: endDate } },
       );
-      setRoute(response.data);
+      setRoute({
+        ...response.data,
+        points: ordenarPontos(response.data?.points ?? []),
+      });
     } catch (error: unknown) {
       console.error("Erro ao buscar rota:", error);
       setError(getApiErrorMessage(error, "Não foi possível carregar as cobranças do cobrador."));
@@ -470,7 +494,10 @@ function CollectorLocationPage() {
       );
       setActivityByCollector((previous) => ({
         ...previous,
-        [collector.userId]: { periodKey, points: response.data?.points ?? [] },
+        [collector.userId]: {
+          periodKey,
+          points: ordenarPontos(response.data?.points ?? []),
+        },
       }));
     } catch (error: unknown) {
       console.error("Erro ao buscar atividade do cobrador:", error);
@@ -524,6 +551,7 @@ function CollectorLocationPage() {
   }, [buscarAtividade, collectors, expandedCollectorId]);
 
   const pontos = route?.points ?? [];
+  const coordenadas = pontos.map((ponto): [number, number] => [ponto.latitude, ponto.longitude]);
   const ultimoPonto = pontos.length > 0 ? pontos[pontos.length - 1] : null;
 
   const formatarData = (data: string | null | undefined) => {
@@ -562,17 +590,6 @@ function CollectorLocationPage() {
 
   const raioCobranca = (withinRadius: boolean) =>
     withinRadius ? "Dentro do raio permitido" : "Fora do raio permitido ou cobrança não validada";
-
-  const estiloMarcador = (color: string) => {
-    const green = color === "GREEN";
-    const red = color === "RED";
-    return {
-      color: green ? "#15803d" : red ? "#b91c1c" : "#6b7280",
-      fillColor: green ? "#22c55e" : red ? "#ef4444" : "#9ca3af",
-      fillOpacity: 1,
-      weight: 3,
-    };
-  };
 
   const abrirCobranca = (ponto: ChargePointDTO) => {
     const params = new URLSearchParams({
@@ -751,7 +768,9 @@ function CollectorLocationPage() {
                               onClick={() => abrirMapaComAtividade(collector, atividade)}
                               style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: 7, background: "#fff", padding: "8px 9px", display: "flex", alignItems: "center", gap: 8, textAlign: "left", cursor: "pointer" }}
                             >
-                              <span style={{ width: 10, height: 10, borderRadius: "50%", flexShrink: 0, background: ponto.color === "GREEN" ? "#22c55e" : "#ef4444" }} />
+                              <span style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", background: ponto.color === "GREEN" ? "#22c55e" : "#ef4444", color: "#fff", fontSize: 11, fontWeight: 700 }}>
+                                {index + 1}
+                              </span>
                               <span style={{ minWidth: 0, flex: 1 }}>
                                 <span style={{ display: "block", color: "#1f2937", fontSize: 12, fontWeight: 600 }}>
                                   Venda #{ponto.saleId} · {statusCobranca(ponto.status)}
@@ -829,15 +848,20 @@ function CollectorLocationPage() {
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
                     <AjustarMapa pontos={pontos} />
+                    {coordenadas.length > 1 && (
+                      <Polyline
+                        positions={coordenadas}
+                        pathOptions={{ color: "#2563eb", weight: 4, opacity: 0.75 }}
+                      />
+                    )}
                     {pontos.map((ponto, index) => {
                       const pontoKey = getPontoKey(ponto, index);
 
                       return (
-                        <CircleMarker
+                        <Marker
                           key={pontoKey}
-                          center={[ponto.latitude, ponto.longitude]}
-                          radius={9}
-                          pathOptions={estiloMarcador(ponto.color)}
+                          position={[ponto.latitude, ponto.longitude]}
+                          icon={criarIconeNumerado(ponto.color, index + 1)}
                           eventHandlers={{
                             mouseover: () => {
                               manterTooltipAberto();
@@ -889,7 +913,7 @@ function CollectorLocationPage() {
                           Status: {statusCobranca(ponto.status)}<br />
                           Raio: {raioCobranca(ponto.withinRadius)}
                         </Popup>
-                        </CircleMarker>
+                        </Marker>
                       );
                     })}
                   </MapContainer>
