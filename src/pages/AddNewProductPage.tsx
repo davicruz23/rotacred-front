@@ -48,122 +48,128 @@ const AddNewProductPage = () => {
       padding: "0 4px",
     },
     formCard: {
-      background: "var(--rtc-card-bg, #fff)",
-      border: "0.5px solid var(--rtc-border, #e0e0e0)",
-      borderRadius: 12,
+      background: "var(--rc-surface, #fff)",
+      border: "1px solid var(--rc-border, #e3ebf5)",
+      borderRadius: 18,
       overflow: "hidden",
-      marginTop: 16,
+      marginTop: 18,
+      boxShadow: "var(--rc-shadow, 0 18px 45px rgba(29, 65, 120, 0.08))",
     },
     cardHead: {
-      padding: "16px 20px",
-      borderBottom: "0.5px solid var(--rtc-border, #e0e0e0)",
-      background: "var(--rtc-panel-bg, #f8f9fa)",
+      padding: "24px 28px",
+      borderBottom: "1px solid var(--rc-border, #e3ebf5)",
+      background: "linear-gradient(135deg, rgba(39, 131, 246, 0.08), rgba(74, 203, 255, 0.04))",
     },
     cardTitle: {
-      fontSize: 15,
-      fontWeight: 600,
-      color: "var(--rtc-text, #1a1a1a)",
+      fontSize: 20,
+      fontWeight: 700,
+      color: "var(--rc-ink, #12294b)",
       margin: 0,
     },
     cardSub: {
-      fontSize: 12,
-      color: "var(--rtc-muted, #888)",
-      marginTop: 3,
+      fontSize: 13,
+      color: "var(--rc-muted, #64748b)",
+      marginTop: 6,
     },
     cardBody: {
-      padding: 20,
+      padding: 28,
     },
     grid: {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-      gap: 16,
+      gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+      gap: 20,
     },
     field: {
       display: "flex",
       flexDirection: "column",
-      gap: 5,
+      gap: 8,
     },
     label: {
       fontSize: 12,
-      fontWeight: 600,
-      color: "var(--rtc-muted, #888)",
+      fontWeight: 700,
+      color: "var(--rc-muted, #64748b)",
+      letterSpacing: "0.02em",
     },
     input: {
-      border: "0.5px solid var(--rtc-input-border, #d0d0d0)",
-      borderRadius: 8,
-      padding: "9px 12px",
-      fontSize: 13,
-      color: "var(--rtc-text, #1a1a1a)",
-      background: "var(--rtc-card-bg, #fff)",
+      border: "1px solid var(--rc-border, #dce6f2)",
+      borderRadius: 10,
+      padding: "12px 14px",
+      fontSize: 14,
+      color: "var(--rc-ink, #12294b)",
+      background: "var(--rc-surface, #fff)",
       outline: "none",
       width: "100%",
     },
     prefixWrap: {
       display: "flex",
       alignItems: "center",
-      border: "0.5px solid var(--rtc-input-border, #d0d0d0)",
-      borderRadius: 8,
+      border: "1px solid var(--rc-border, #dce6f2)",
+      borderRadius: 10,
       overflow: "hidden",
-      background: "var(--rtc-card-bg, #fff)",
+      background: "var(--rc-surface, #fff)",
     },
     prefix: {
-      padding: "9px 12px",
-      fontSize: 13,
-      color: "var(--rtc-muted, #888)",
-      background: "var(--rtc-panel-bg, #f8f9fa)",
-      borderRight: "0.5px solid var(--rtc-border, #e0e0e0)",
+      padding: "12px 14px",
+      fontSize: 14,
+      color: "var(--rc-muted, #64748b)",
+      background: "var(--rc-page, #f3f7fc)",
+      borderRight: "1px solid var(--rc-border, #e3ebf5)",
       whiteSpace: "nowrap" as const,
       flexShrink: 0,
     },
     prefixInput: {
       border: "none",
       outline: "none",
-      padding: "9px 12px",
-      fontSize: 13,
-      color: "var(--rtc-text, #1a1a1a)",
+      padding: "12px 14px",
+      fontSize: 14,
+      color: "var(--rc-ink, #12294b)",
       background: "transparent",
       width: "100%",
     },
     divider: {
       border: "none",
-      borderTop: "0.5px solid var(--rtc-border, #e0e0e0)",
-      margin: "20px 0 16px",
+      borderTop: "1px solid var(--rc-border, #e3ebf5)",
+      margin: "28px 0 22px",
     },
     submitBtn: {
       width: "100%",
-      padding: "11px",
-      borderRadius: 8,
+      padding: "13px",
+      borderRadius: 10,
       border: "none",
-      background: "#185FA5",
-      color: "#E6F1FB",
+      background: "linear-gradient(135deg, #2783f6, #1769ed)",
+      color: "#ffffff",
       fontSize: 14,
-      fontWeight: 600,
+      fontWeight: 700,
       cursor: "pointer",
+      boxShadow: "0 10px 22px rgba(23, 105, 237, 0.18)",
     },
   };
 
   return (
-    <div style={S.page}>
+    <div style={S.page} className="product-page product-form-page product-create-page">
       <div className="row g-4">
         <div className="col-12">
-          <BreadcrumbSection
-            title="Adicionar Novo Produto"
-            link="/all-product"
-          />
+          <div className="product-page__breadcrumb">
+            <BreadcrumbSection
+              title="Adicionar Novo Produto"
+              link="/all-product"
+            />
+          </div>
         </div>
 
         <div className="col-12">
-          <div style={S.formCard}>
-            <div style={S.cardHead}>
+          <div style={S.formCard} className="product-form-card">
+            <div style={S.cardHead} className="product-form-card__header">
+              <span className="product-page__eyebrow">CATÁLOGO / NOVO PRODUTO</span>
               <div style={S.cardTitle}>Informações do produto</div>
               <div style={S.cardSub}>
                 Preencha os campos abaixo para cadastrar um novo produto
               </div>
             </div>
 
-            <div style={S.cardBody}>
+            <div style={S.cardBody} className="product-form-card__body">
               <form onSubmit={handleSubmit}>
-                <div style={S.grid}>
+                <div style={S.grid} className="product-form__grid">
                   {/* Nome */}
                   <div style={S.field}>
                     <label style={S.label}>Nome do produto</label>
@@ -243,9 +249,11 @@ const AddNewProductPage = () => {
 
                 <hr style={S.divider} />
 
-                <button type="submit" style={S.submitBtn}>
-                  Adicionar produto
-                </button>
+                <div className="product-form__actions">
+                  <button type="submit" style={S.submitBtn}>
+                    Adicionar produto
+                  </button>
+                </div>
               </form>
             </div>
           </div>

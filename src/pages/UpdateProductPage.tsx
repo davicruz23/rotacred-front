@@ -77,19 +77,36 @@ const UptadeProductPage = () => {
     }
   };
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) {
+    return (
+      <div className="product-page product-loading-state">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Carregando...</span>
+        </div>
+        <span>Carregando produto...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="container-fluid my-5">
-      <BreadcrumbSection title="Editar Produto" link="/all-product" />
+    <div className="product-page product-form-page product-update-page">
+      <div className="product-page__breadcrumb">
+        <BreadcrumbSection title="Editar Produto" link="/all-product" />
+      </div>
 
-      <div className="card shadow-sm mt-4 w-100">
-        <div className="card-body">
-          <h4 className="card-title mb-4">
-            {product.name} - {product.brand}
-          </h4>
+      <div className="card product-form-card mt-4 w-100">
+        <div className="product-form-card__header">
+          <span className="product-page__eyebrow">CATÁLOGO / EDIÇÃO</span>
+          <h1>{product.name}</h1>
+          <p>Atualize estoque e valor sem perder o histórico do produto.</p>
+          <span className="product-form-card__reference">
+            <i className="ti ti-package" /> {product.brand}
+          </span>
+        </div>
 
-          <form onSubmit={handleSubmit} className="row g-3">
+        <div className="card-body product-form-card__body">
+
+          <form onSubmit={handleSubmit} className="row g-4 product-form">
             <div className="col-md-6">
               <label className="form-label">Quantidade</label>
               <input
@@ -117,7 +134,7 @@ const UptadeProductPage = () => {
               />
             </div>
 
-            <div className="col-12 mt-3">
+            <div className="col-12 product-form__actions">
               <button type="submit" className="btn btn-primary btn-lg w-100">
                 Atualizar Produto
               </button>

@@ -104,60 +104,75 @@ const AllProductPage = () => {
   const indexOfLastData = indexOfFirstData + dataList.length;
 
   return (
-    <div className="row g-4">
+    <div className="row g-4 product-page product-list-page">
       <div className="col-12">
-        <div className="panel">
-          <div className="panel-body">
-            <div className="product-table-quantity">
-              <ul>
-                <li className="text-white">Todos Produtos ({totalElements})</li>
-              </ul>
-            </div>
+        <div className="product-page__heading">
+          <div>
+            <span className="product-page__eyebrow">CATÁLOGO &amp; ESTOQUE</span>
+            <h1>Produtos</h1>
+            <p>Consulte, organize e mantenha seu inventário sempre atualizado.</p>
+          </div>
 
-            <div className="row g-2 mb-3">
-              <div className="col-12">
-                <div className="d-flex align-items-center gap-3 flex-wrap">
-                  <div className="input-group" style={{ width: "420px" }}>
-                    <span className="input-group-text">
-                      <i className="fa-light fa-magnifying-glass"></i>
-                    </span>
+          <div className="product-page__metric">
+            <span>Itens cadastrados</span>
+            <strong>{totalElements}</strong>
+            <small>no catálogo</small>
+          </div>
+        </div>
 
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Pesquisar por nome do produto..."
-                      value={searchName}
-                      onChange={(e) => setSearchName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleSearch();
-                      }}
-                    />
+        <div className="panel product-panel">
+          <div className="panel-body product-panel__body">
+            <div className="product-toolbar">
+              <div className="product-toolbar__copy">
+                <span className="product-toolbar__eyebrow">INVENTÁRIO</span>
+                <h2>Todos os produtos</h2>
+                <p>Pesquise por nome para encontrar um item rapidamente.</p>
+              </div>
 
-                    {searchName?.trim() && (
-                      <button
-                        className="btn btn-outline-secondary"
-                        type="button"
-                        onClick={() => setSearchName("")}
-                        title="Limpar"
-                      >
-                        <i className="fa-light fa-xmark"></i>
-                      </button>
-                    )}
-                  </div>
-                  <small className="text-muted">
-                    {searchName?.trim()
-                      ? `Filtrando por: "${searchName}"`
-                      : ""}
-                  </small>
+              <div className="product-toolbar__search">
+                <div className="input-group product-search-group">
+                  <span className="input-group-text">
+                    <i className="fa-light fa-magnifying-glass"></i>
+                  </span>
+
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Pesquisar produto..."
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSearch();
+                    }}
+                    aria-label="Pesquisar produto por nome"
+                  />
+
+                  {searchName?.trim() && (
+                    <button
+                      className="btn product-search-clear"
+                      type="button"
+                      onClick={() => setSearchName("")}
+                      title="Limpar pesquisa"
+                    >
+                      <i className="fa-light fa-xmark"></i>
+                    </button>
+                  )}
                 </div>
+
+                <small className="product-search-caption">
+                  {searchName?.trim()
+                    ? `Filtrando por: "${searchName}"`
+                    : `${totalElements} itens disponíveis`}
+                </small>
               </div>
             </div>
 
             {loading ? (
-              <div className="text-center py-5">
+              <div className="product-loading-state">
                 <div className="spinner-border text-primary" role="status">
                   <span className="visually-hidden">Carregando...</span>
                 </div>
+                <span>Carregando produtos...</span>
               </div>
             ) : (
               <div className="table-responsive">

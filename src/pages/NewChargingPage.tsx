@@ -40,27 +40,29 @@ const normalizePage = <T,>(data: PageResponse<T>) => {
 
 const S = {
   sectionCard: {
-    background: "var(--rtc-card-bg, #fff)",
-    border: "0.5px solid var(--rtc-border, #e0e0e0)",
-    borderRadius: 12,
-    marginTop: 14,
+    background: "var(--rc-surface, #fff)",
+    border: "1px solid var(--rc-border, #e3ebf5)",
+    borderRadius: 18,
+    marginTop: 18,
     overflow: "hidden",
+    boxShadow: "var(--rc-shadow, 0 18px 45px rgba(29, 65, 120, 0.08))",
   } as React.CSSProperties,
 
   sectionHeader: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "14px 18px",
+    padding: "18px 22px",
     cursor: "pointer",
-    background: "var(--rtc-panel-bg, #f8f9fa)",
+    background: "var(--rc-page, #f3f7fc)",
     border: "none",
+    borderBottom: "1px solid var(--rc-border, #e3ebf5)",
     width: "100%",
     textAlign: "left" as const,
   } as React.CSSProperties,
 
   sectionBody: {
-    borderTop: "0.5px solid var(--rtc-border, #e0e0e0)",
+    borderTop: "1px solid var(--rc-border, #e3ebf5)",
   } as React.CSSProperties,
 
   dot: (color: string): React.CSSProperties => ({
@@ -82,23 +84,23 @@ const S = {
     padding: "8px 12px",
     fontSize: 11,
     fontWeight: 600,
-    color: "var(--rtc-muted, #888)",
-    borderBottom: "0.5px solid var(--rtc-border, #e0e0e0)",
-    background: "var(--rtc-panel-bg, #f8f9fa)",
+    color: "var(--rc-muted, #64748b)",
+    borderBottom: "1px solid var(--rc-border, #e3ebf5)",
+    background: "var(--rc-page, #f3f7fc)",
     whiteSpace: "nowrap" as const,
   } as React.CSSProperties,
 
   td: {
     padding: "9px 12px",
-    borderBottom: "0.5px solid var(--rtc-border, #e0e0e0)",
-    color: "var(--rtc-text, #1a1a1a)",
+    borderBottom: "1px solid var(--rc-border, #e3ebf5)",
+    color: "var(--rc-ink, #12294b)",
     verticalAlign: "middle" as const,
   } as React.CSSProperties,
 
   tdMuted: {
     padding: "9px 12px",
-    borderBottom: "0.5px solid var(--rtc-border, #e0e0e0)",
-    color: "var(--rtc-soft-muted, #aaa)",
+    borderBottom: "1px solid var(--rc-border, #e3ebf5)",
+    color: "var(--rc-muted, #64748b)",
     verticalAlign: "middle" as const,
     fontSize: 12,
   } as React.CSSProperties,
@@ -109,14 +111,14 @@ const S = {
     justifyContent: "space-between",
     padding: "10px 16px",
     borderTop: "0.5px solid var(--rtc-border, #e0e0e0)",
-    background: "var(--rtc-panel-bg, #f8f9fa)",
+    background: "var(--rc-page, #f3f7fc)",
     flexWrap: "wrap" as const,
     gap: 8,
   } as React.CSSProperties,
 
   sendBtn: {
-    background: "#185FA5",
-    color: "#E6F1FB",
+    background: "linear-gradient(135deg, #2783f6, #1769ed)",
+    color: "#ffffff",
     border: "none",
     borderRadius: 8,
     padding: "8px 20px",
@@ -126,8 +128,8 @@ const S = {
   } as React.CSSProperties,
 
   editBtn: {
-    background: "var(--rtc-disabled-bg, #f1f1f1)",
-    border: "0.5px solid var(--rtc-border, #e0e0e0)",
+    background: "var(--rc-page, #f3f7fc)",
+    border: "1px solid var(--rc-border, #e3ebf5)",
     borderRadius: 6,
     padding: "5px 10px",
     fontSize: 13,
@@ -146,23 +148,23 @@ const S = {
   } as React.CSSProperties,
 
   qtyInput: {
-    border: "0.5px solid var(--rtc-input-border, #d0d0d0)",
+    border: "1px solid var(--rc-border, #dce6f2)",
     borderRadius: 6,
     padding: "4px 8px",
     fontSize: 13,
     width: 80,
     outline: "none",
-    background: "var(--rtc-card-bg, #fff)",
-    color: "var(--rtc-text, #1a1a1a)",
+    background: "var(--rc-surface, #fff)",
+    color: "var(--rc-ink, #12294b)",
   } as React.CSSProperties,
 
   searchWrap: {
     display: "flex",
     alignItems: "center",
     gap: 8,
-    background: "var(--rtc-card-bg, #fff)",
-    border: "0.5px solid var(--rtc-input-border, #d0d0d0)",
-    borderRadius: 8,
+    background: "var(--rc-surface, #fff)",
+    border: "1px solid var(--rc-border, #dce6f2)",
+    borderRadius: 10,
     padding: "0 12px",
     height: 38,
     width: "100%",
@@ -174,7 +176,7 @@ const S = {
     outline: "none",
     background: "transparent",
     fontSize: 13,
-    color: "var(--rtc-text, #1a1a1a)",
+    color: "var(--rc-ink, #12294b)",
     width: "100%",
   } as React.CSSProperties,
 
@@ -192,8 +194,8 @@ const S = {
   modalBox: {
     width: "100%",
     maxWidth: 430,
-    background: "var(--rtc-card-bg, #fff)",
-    borderRadius: 12,
+    background: "var(--rc-surface, #fff)",
+    borderRadius: 18,
     padding: 20,
     boxShadow: "0 20px 45px rgba(0, 0, 0, 0.25)",
   } as React.CSSProperties,
@@ -493,10 +495,24 @@ const NewChargingPage = () => {
   );
 
   return (
-    <div style={{ padding: "0 4px" }}>
+    <div style={{ padding: "0 4px" }} className="product-page product-charging-page">
       <div className="col-12">
+        <div className="product-page__heading product-page__heading--charging">
+          <div>
+            <span className="product-page__eyebrow">OPERAÇÃO DE ESTOQUE</span>
+            <h1>Atualizar carregamento</h1>
+            <p>Envie produtos para a equipe e acompanhe as devoluções em um só lugar.</p>
+          </div>
+
+          <div className="product-page__metric">
+            <span>Produtos no estoque</span>
+            <strong>{totalElements}</strong>
+            <small>itens disponíveis</small>
+          </div>
+        </div>
         {/* ── Barra de pesquisa ── */}
         <div
+          className="product-charging-search"
           style={{
             display: "flex",
             alignItems: "center",
@@ -558,7 +574,7 @@ const NewChargingPage = () => {
         </div>
 
         {/* ── Seção: Carregamento atual ── */}
-        <div style={S.sectionCard}>
+        <div style={S.sectionCard} className="product-operation-card">
           <div
             style={S.sectionHeader}
             onClick={() => setOpenCharging((v) => !v)}
@@ -704,7 +720,7 @@ const NewChargingPage = () => {
         </div>
 
         {/* ── Seção: Produtos do estoque ── */}
-        <div style={S.sectionCard}>
+        <div style={S.sectionCard} className="product-operation-card">
           <button
             type="button"
             style={S.sectionHeader}

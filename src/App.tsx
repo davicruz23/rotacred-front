@@ -43,6 +43,7 @@ import CommissionHistory from "./pages/CommissionHistoryPage";
 import DirectSalePage from "./pages/DirectSalePage";
 import SalesListPage from "./pages/SalesList";
 import CollectorLocationPage from "./pages/CollectorLocationPage";
+import ReportsPage from "./pages/ReportsPage";
 
 function App() {
   const activeLayout = useAppSelector((state) => state.layout.isLayout);
@@ -100,6 +101,7 @@ function App() {
                 <Route path="/report-clients" element={<ReportClientsPage />} />
                 <Route path="/report-chargings" element={<ReportCharginsPage />} />
                 <Route path="/report-products" element={<ReportProductsPage />} />
+                <Route path="/reports" element={<ReportsPage />} />
                 <Route path="/collector-cities" element={<AddCitiesByCollectorPage />} />
                 <Route path="/collector-sales" element={<ListCollectorSalesPage />} />
                 <Route path="/list-sales-return" element={<ListReturnSalesStatus />} />

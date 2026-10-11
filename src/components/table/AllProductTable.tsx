@@ -10,7 +10,7 @@ type Props = {
 const AllProductTable = ({ tableData, handleDelete }: Props) => {
   const navigate = useNavigate();
   return (
-    <table className="table table-dashed table-hover digi-dataTable all-product-table">
+    <table className="table table-dashed table-hover digi-dataTable all-product-table product-data-table">
       <thead>
         <tr>
           <th className="no-sort">
@@ -35,6 +35,9 @@ const AllProductTable = ({ tableData, handleDelete }: Props) => {
             </td>
             <td>
               <div className="table-product-card">
+                <div className="product-row-icon" aria-hidden="true">
+                  {item.name.charAt(0).toUpperCase()}
+                </div>
                 <div className="part-txt">
                   <span className="product-name">{item.name}</span>
                   <span className="product-category">Marca: {item.brand}</span>
@@ -43,9 +46,14 @@ const AllProductTable = ({ tableData, handleDelete }: Props) => {
             </td>
             <td>{item.amount}</td>
             <td>${item.value}</td>
-            <td>{ProductStatusLabel[item.status]}</td>
             <td>
-              <div className="btn-box">
+              <span className={`product-status product-status--${item.status}`}>
+                <span className="product-status__dot" />
+                {ProductStatusLabel[item.status]}
+              </span>
+            </td>
+            <td>
+              <div className="btn-box product-actions">
                 <button
                   title="Editar"
                   onClick={() => navigate(`/update-product/${item.id}`)}

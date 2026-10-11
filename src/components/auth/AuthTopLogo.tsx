@@ -7,10 +7,10 @@ const AuthTopLogo = () => {
       <div className="logo">
         <a href="#">
           {darkMode ? (
-            <img src="/img/core-img/rotaa.png" alt="logo" />
+            <img src="/img/core-img/rotacredlogolinhabranca.png" alt="logo" />
           ) : (
             <img
-              src="/img/core-img/rotaa.png"
+              src="/img/core-img/rotacredlogolinhabranca.png"
               alt="logo"
               style={{
                 maxWidth: "400px",

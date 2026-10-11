@@ -45,14 +45,18 @@ const navData = [
         icon: "ti ti-file-description",
         url: "#",
         subLinks: [
+          // {
+          //   subTitle: "Produtos",
+          //   subUrl: "/report-products",
+          // },
           {
-            subTitle: "Produtos",
-            subUrl: "/report-products",
-          },
-          {
-            subTitle: "Carregamentos",
-            subUrl: "/report-chargings",
-          },
+            subTitle: "Relatórios PDF",
+            subUrl: "/reports",
+          }
+          // {
+          //   subTitle: "Carregamentos",
+          //   subUrl: "/report-chargings",
+          // },
           
         ],
       },
