@@ -154,7 +154,7 @@ const navData = [
         ],
       },
       {
-        title: "Usuarios",
+        title: "Usuários",
         hasSub: true,
         icon: "ti ti-user-star",
         url: "#",

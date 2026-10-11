@@ -13,10 +13,10 @@ const CityCountCard = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) return <div className="dashboard-kpi-skeleton">Carregando...</div>;
 
   return (
-    <div className="card saas-cta-card">
+    <div className="card saas-cta-card dashboard-kpi-card dashboard-kpi-card--cities">
       <div className="d-flex align-items-center">
         <div className="icon-wrap">
           <i className="ti ti-building"></i>

@@ -13,9 +13,9 @@ import VisitorCard from "../cards/VisitorCard";
 const SaasMain = () => {
   const activeLayout = useAppSelector((state) => state.layout.isLayout);
   return (
-    <div className="row g-4">
-      <div className="col-12">
-        <div className="row g-4">
+    <div className="row g-4 dashboard-workspace">
+      <div className="col-12 dashboard-kpi-section">
+        <div className="row g-4 dashboard-kpi-grid">
           <div
             className={`col-12 col-sm-6 col-lg-4 ${activeLayout === "style-1" ||
               activeLayout === "style-3" ||
@@ -57,20 +57,20 @@ const SaasMain = () => {
         </div>
       </div>
 
-      <div className="col-12 col-xl-7">
+      <div className="col-12 col-xl-7 dashboard-chart-col dashboard-chart-col--wide">
         <CustomerCard />
       </div>
 
-      <div className="col-12 col-lg-6 col-xl-5">
+      <div className="col-12 col-lg-6 col-xl-5 dashboard-chart-col">
         <SessionsByDeviceCard />
       </div>
 
-      <div className="col-12 col-lg-6 col-xl-5">
+      <div className="col-12 col-lg-6 col-xl-5 dashboard-chart-col">
         <SalesByProductCard />
       </div>
 
       <div
-        className={`col-12 col-lg-6 ${activeLayout === "style-1" ||
+        className={`col-12 col-lg-6 dashboard-collector-col ${activeLayout === "style-1" ||
           activeLayout === "style-3" ||
           activeLayout === "style-4"
           ? "col-xxl-3 col-xl-6"
@@ -93,7 +93,7 @@ const SaasMain = () => {
       </div>
 
       <div
-        className={`col-12 ${activeLayout === "style-1" ||
+        className={`col-12 dashboard-actions-col ${activeLayout === "style-1" ||
           activeLayout === "style-3" ||
           activeLayout === "style-4"
           ? "col-lg-12 col-xxl-4 col-xl-6"

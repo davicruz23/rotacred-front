@@ -45,7 +45,7 @@ const RecentCustomerCard = () => {
   }, []);
 
   return (
-    <div className="card full-height">
+    <div className="card full-height dashboard-card dashboard-recent-card">
       <div className="card-header-area mb-3 recent-customer-wrap orders-sales-overview-wrap flex-wrap">
         <h5 className="fw-medium">Clientes Recentes</h5>
         {/* <MonthDropdown /> */}

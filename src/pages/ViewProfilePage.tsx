@@ -269,16 +269,16 @@ const ViewProfilePage = () => {
   }, []);
 
   return (
-    <div style={S.page}>
-      <div className="row g-4">
+    <div className="users-workspace users-list-page" style={S.page}>
+      <div className="row g-4 users-page-grid">
         <div className="col-12">
-          <div style={S.card}>
-            <div style={S.cardHead}>
-              <div style={S.cardTitle}>Lista de usuários</div>
+          <div className="users-card" style={S.card}>
+            <div className="users-card__head" style={S.cardHead}>
+              <div className="users-card-title" style={S.cardTitle}>Lista de usuários</div>
             </div>
 
-            <div style={{ overflowX: "auto" }}>
-              <table style={S.table}>
+            <div className="users-table-scroll" style={{ overflowX: "auto" }}>
+              <table className="users-table" style={S.table}>
                 <thead>
                   <tr>
                     <th style={S.th}>ID</th>
@@ -320,6 +320,7 @@ const ViewProfilePage = () => {
                         <td style={S.td}>
                           <div style={S.nameCell}>
                             <div
+                              className="users-avatar"
                               style={{
                                 width: 30,
                                 height: 30,
@@ -343,12 +344,13 @@ const ViewProfilePage = () => {
                         </td>
                         <td style={S.tdMuted}>{u.cpf}</td>
                         <td style={S.td}>
-                          <span style={positionBadgeStyle(u.position)}>
+                          <span className="users-role-badge" style={positionBadgeStyle(u.position)}>
                             {u.position}
                           </span>
                         </td>
                         <td style={{ ...S.td, textAlign: "right" }}>
                           <button
+                            className="users-password-button"
                             style={S.keyBtn}
                             title="Alterar senha"
                             onClick={() => {
@@ -371,16 +373,16 @@ const ViewProfilePage = () => {
 
       {/* ── Modal ── */}
       {showModal && (
-        <div style={S.overlay} onClick={() => setShowModal(false)}>
-          <div style={S.modalBox} onClick={(e) => e.stopPropagation()}>
-            <div style={S.modalHead}>
-              <span style={S.modalTitle}>Alterar senha</span>
-              <button style={S.closeBtn} onClick={() => setShowModal(false)}>
+        <div className="users-overlay" style={S.overlay} onClick={() => setShowModal(false)}>
+          <div className="users-modal" style={S.modalBox} onClick={(e) => e.stopPropagation()}>
+            <div className="users-modal__head" style={S.modalHead}>
+              <span className="users-modal-title" style={S.modalTitle}>Alterar senha</span>
+              <button className="users-modal-close" style={S.closeBtn} onClick={() => setShowModal(false)}>
                 ✕
               </button>
             </div>
 
-            <div style={S.modalBody}>
+            <div className="users-modal__body" style={S.modalBody}>
               <div style={S.field}>
                 <label style={S.label}>Nova senha</label>
                 <input
@@ -403,11 +405,11 @@ const ViewProfilePage = () => {
               </div>
             </div>
 
-            <div style={S.modalFoot}>
-              <button style={S.cancelBtn} onClick={() => setShowModal(false)}>
+            <div className="users-modal__foot" style={S.modalFoot}>
+              <button className="users-modal-cancel" style={S.cancelBtn} onClick={() => setShowModal(false)}>
                 Cancelar
               </button>
-              <button style={S.saveBtn} onClick={handleUpdatePassword}>
+              <button className="users-modal-save" style={S.saveBtn} onClick={handleUpdatePassword}>
                 Salvar
               </button>
             </div>

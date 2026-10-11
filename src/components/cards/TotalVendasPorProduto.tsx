@@ -25,13 +25,13 @@ const SalesByProductCard = () => {
 
   if (loading)
     return (
-      <div className="card ps-0 full-height d-flex align-items-center justify-content-center">
+      <div className="card ps-0 full-height dashboard-card dashboard-product-card d-flex align-items-center justify-content-center">
         <p>Carregando...</p>
       </div>
     );
 
   return (
-    <div className="card ps-0 full-height">
+    <div className="card ps-0 full-height dashboard-card dashboard-product-card">
       <h5 className="mb-4 fw-medium ps-4">Produtos Mais Vendidos</h5>
 
       <div className="d-flex align-items-center justify-content-between">

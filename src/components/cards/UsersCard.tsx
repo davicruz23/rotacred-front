@@ -19,7 +19,7 @@ const UsersCard = () => {
 
   if (loading) {
     return (
-      <div className="card saas-cta-card d-flex align-items-center justify-content-center">
+      <div className="card saas-cta-card dashboard-kpi-card dashboard-kpi-card--clients d-flex align-items-center justify-content-center">
         <p className="text-white mb-0">Carregando...</p>
       </div>
     );
@@ -28,7 +28,7 @@ const UsersCard = () => {
   const total = data?.totalClients ?? 0;
 
   return (
-    <div className="card saas-cta-card">
+    <div className="card saas-cta-card dashboard-kpi-card dashboard-kpi-card--clients">
       <div className="d-flex align-items-center">
         <div className="icon-wrap">
           <i className="ti ti-users"></i>

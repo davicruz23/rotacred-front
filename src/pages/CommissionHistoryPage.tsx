@@ -270,7 +270,7 @@ const CommissionHistory = () => {
         const endpoint = isCollector
           ? "/collector/collector-commission-history"
           : "/seller/commission-history";
-        const params: any = { page, size };
+        const params: Record<string, number> = { page, size };
         if (ownerId) {
           if (isCollector) params.collectorId = ownerId;
           else params.sellerId = ownerId;
@@ -313,22 +313,23 @@ const CommissionHistory = () => {
   };
 
   return (
-    <div style={S.page}>
-      <div className="container-fluid px-1 my-1">
+    <div className="commission-page" style={S.page}>
+      <div className="container-fluid px-1 my-1 commission-page__inner">
         <BreadcrumbSection title="Histórico de Comissão" link="/inicio" />
 
-        <div style={S.card}>
+        <div className="commission-card commission-history-card" style={S.card}>
           {/* ── Cabeçalho ── */}
-          <div style={S.cardHead}>
+          <div className="commission-card__header" style={S.cardHead}>
             <div style={S.cardTitle}>Consulta de comissões anteriores</div>
           </div>
 
           {/* ── Filtros ── */}
-          <div style={S.cardBody}>
-            <div style={S.filtersRow}>
-              <div style={S.field}>
+          <div className="commission-card__body" style={S.cardBody}>
+            <div className="commission-form-grid" style={S.filtersRow}>
+              <div className="commission-field" style={S.field}>
                 <label style={S.label}>Tipo de funcionário *</label>
                 <select
+                  className="commission-control"
                   style={S.select}
                   value={ownerType ?? ""}
                   onChange={(e) => {
@@ -347,13 +348,14 @@ const CommissionHistory = () => {
                 </select>
               </div>
 
-              <div style={S.field}>
+              <div className="commission-field" style={S.field}>
                 <label style={S.label}>
                   {ownerType === CommissionOwnerType.SELLER
                     ? "Vendedor"
                     : "Cobrador"}
                 </label>
                 <select
+                  className="commission-control"
                   style={ownerType ? S.select : S.selectDisabled}
                   value={ownerId ?? ""}
                   disabled={!ownerType}
@@ -391,7 +393,7 @@ const CommissionHistory = () => {
 
           {!loading && history && history.content.length > 0 && (
             <>
-              <div style={S.tableWrap}>
+              <div className="commission-table-wrap" style={S.tableWrap}>
                 <table style={S.table}>
                   <thead>
                     <tr>
@@ -453,7 +455,7 @@ const CommissionHistory = () => {
               </div>
 
               {/* ── Paginação ── */}
-              <div style={S.footer}>
+              <div className="commission-pagination" style={S.footer}>
                 <span style={S.pgInfo}>
                   Página {page + 1} de {history.totalPages}
                 </span>

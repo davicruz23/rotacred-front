@@ -47,13 +47,13 @@ const LeftSidebarSection = ({
             {darkMode ? (
               <img
                 className="dark-mode-logo"
-                src="/img/core-img/rotacredlogolinhabranca.png"
+                src="/img/core-img/rotacredlogolinhaazul.png"
                 alt="logo"
               />
             ) : (
               <img
                 className="light-mode-logo"
-                src="/img/core-img/rotacredlogolinhabranca.png"
+                src="/img/core-img/rotacredlogolinhaazul.png"
                 alt="logo"
               />
             )}

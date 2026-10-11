@@ -37,7 +37,7 @@ const UsersCard2List = () => {
         const offset = circumference - (percentage / 100) * circumference;
 
         return (
-          <div key={c.collectorId} className="card saas-small-card">
+          <div key={c.collectorId} className="card saas-small-card dashboard-card dashboard-collector-card">
             <div className="d-flex align-items-center justify-content-between">
               {/* Esperado */}
               <div className="text-end">

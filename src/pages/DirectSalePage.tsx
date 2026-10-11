@@ -449,7 +449,7 @@ const DirectSalePage = () => {
       } else {
         alert("Erro ao carregar produtos");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       alert("Erro ao conectar com o servidor");
     } finally {
@@ -722,10 +722,17 @@ const DirectSalePage = () => {
       } else {
         alert("Erro ao cadastrar venda");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
+      const responseMessage =
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
       alert(
-        error?.response?.data?.message ||
+        responseMessage ||
         "Erro ao conectar com o servidor ao cadastrar venda",
       );
     } finally {
@@ -830,21 +837,21 @@ const DirectSalePage = () => {
   };
 
   return (
-    <div style={S.page}>
-      <div className="row g-4">
+    <div className="sales-workspace sales-create-page" style={S.page}>
+      <div className="row g-4 sales-create-grid">
         <div className="col-12">
-          <div style={S.card}>
-            <div style={S.cardHead}>
-              <div style={S.cardTitle}>Dados do cliente</div>
+          <div className="sales-card sales-client-card" style={S.card}>
+            <div className="sales-card__head" style={S.cardHead}>
+              <div className="sales-card-title" style={S.cardTitle}>Dados do cliente</div>
             </div>
 
-            <div style={S.cardBody}>
-              <div style={{ marginBottom: 16 }}>
+            <div className="sales-card__body" style={S.cardBody}>
+              <div className="sales-client-search" style={{ marginBottom: 16 }}>
                 <div style={S.field}>
                   <label style={S.label}>Buscar cliente cadastrado</label>
 
                   <div style={{ position: "relative" }}>
-                    <div style={S.searchWrap}>
+                    <div className="sales-search-shell" style={S.searchWrap}>
                       <i
                         className="fa-light fa-magnifying-glass"
                         style={{
@@ -856,6 +863,7 @@ const DirectSalePage = () => {
 
                       <input
                         type="text"
+                        className="sales-search-input"
                         style={S.searchInput}
                         placeholder="Digite nome ou CPF do cliente..."
                         value={clientSearch}
@@ -883,6 +891,7 @@ const DirectSalePage = () => {
 
                     {clientResults.length > 0 && !selectedClientId && (
                       <div
+                        className="sales-client-results"
                         style={{
                           position: "absolute",
                           top: 42,
@@ -959,7 +968,7 @@ const DirectSalePage = () => {
                 </div>
               </div>
 
-              <div style={S.gridClient}>
+              <div className="sales-client-fields" style={S.gridClient}>
                 <div style={S.field}>
                   <label style={S.label}>Nome</label>
                   <input
@@ -1013,6 +1022,7 @@ const DirectSalePage = () => {
 
               {!selectedClientId && (
                 <div
+                  className="sales-address-grid"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
@@ -1106,13 +1116,13 @@ const DirectSalePage = () => {
             </div>
           </div>
 
-          <div style={S.card}>
-            <div style={S.cardHead}>
-              <div style={S.cardTitle}>Produtos da venda</div>
+          <div className="sales-card sales-products-card" style={S.card}>
+            <div className="sales-card__head" style={S.cardHead}>
+              <div className="sales-card-title" style={S.cardTitle}>Produtos da venda</div>
             </div>
-            <div style={S.cardBody}>
-              <div style={{ marginBottom: 14 }}>
-                <div style={S.searchWrap}>
+            <div className="sales-card__body" style={S.cardBody}>
+              <div className="sales-product-search" style={{ marginBottom: 14 }}>
+                <div className="sales-search-shell" style={S.searchWrap}>
                   <i
                     className="fa-light fa-magnifying-glass"
                     style={{
@@ -1123,6 +1133,7 @@ const DirectSalePage = () => {
                   />
                   <input
                     type="text"
+                    className="sales-search-input"
                     style={S.searchInput}
                     placeholder="Pesquisar produto..."
                     value={searchName}
@@ -1153,8 +1164,8 @@ const DirectSalePage = () => {
                   </div>
                 </div>
               ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table style={S.table}>
+                <div className="sales-table-scroll" style={{ overflowX: "auto" }}>
+                  <table className="sales-data-table" style={S.table}>
                     <thead>
                       <tr>
                         <th style={S.th}>Produto</th>
@@ -1171,7 +1182,7 @@ const DirectSalePage = () => {
                           </td>
                         </tr>
                       ) : (
-                        products.map((product: any) => (
+                        products.map((product: ChargingItem) => (
                           <tr
                             key={product.id}
                             onMouseEnter={(e) =>
@@ -1196,6 +1207,7 @@ const DirectSalePage = () => {
                             <td style={S.td}>{getProductQuantity(product)}</td>
                             <td style={S.tdRight}>
                               <button
+                                className="sales-add-product-button"
                                 style={S.addBtn}
                                 type="button"
                                 onClick={() => handleAddProduct(product)}
@@ -1217,10 +1229,10 @@ const DirectSalePage = () => {
             </div>
           </div>
 
-          <div style={S.card}>
-            <div style={S.cardHead}>
+          <div className="sales-card sales-selected-card" style={S.card}>
+            <div className="sales-card__head" style={S.cardHead}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={S.cardTitle}>Itens selecionados</span>
+                <span className="sales-card-title" style={S.cardTitle}>Itens selecionados</span>
                 {selectedProducts.length > 0 && (
                   <span
                     style={{
@@ -1237,8 +1249,8 @@ const DirectSalePage = () => {
                 )}
               </div>
             </div>
-            <div style={{ overflowX: "auto" }}>
-              <table style={S.table}>
+            <div className="sales-card__body sales-table-scroll" style={{ overflowX: "auto" }}>
+              <table className="sales-data-table" style={S.table}>
                 <thead>
                   <tr>
                     <th style={S.th}>Produto</th>
@@ -1295,6 +1307,7 @@ const DirectSalePage = () => {
                         </td>
                         <td style={S.tdRight}>
                           <button
+                            className="sales-remove-product-button"
                             style={S.removeBtn}
                             type="button"
                             onClick={() => handleRemoveProduct(item.productId)}
@@ -1310,13 +1323,13 @@ const DirectSalePage = () => {
             </div>
           </div>
 
-          <div style={S.card}>
-            <div style={S.cardHead}>
-              <div style={S.cardTitle}>Pagamento</div>
+          <div className="sales-card sales-payment-card" style={S.card}>
+            <div className="sales-card__head" style={S.cardHead}>
+              <div className="sales-card-title" style={S.cardTitle}>Pagamento</div>
             </div>
 
-            <div style={S.cardBody}>
-              <div style={S.grid3}>
+            <div className="sales-card__body" style={S.cardBody}>
+              <div className="sales-payment-fields" style={S.grid3}>
                 {/* Data da venda */}
                 <div style={S.field}>
                   <label style={S.label}>Data da venda</label>
@@ -1332,6 +1345,7 @@ const DirectSalePage = () => {
                   />
 
                   <label
+                    className="sales-date-toggle-label"
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -1409,13 +1423,13 @@ const DirectSalePage = () => {
                 </div>
               </div>
 
-              <div style={{ ...S.summaryRow, marginTop: 20 }}>
-                <div style={S.summaryCard}>
+              <div className="sales-summary-row" style={{ ...S.summaryRow, marginTop: 20 }}>
+                <div className="sales-summary-card" style={S.summaryCard}>
                   <div style={S.summaryLabel}>Total da venda</div>
                   <div style={S.summaryValue}>{brl(totalSale)}</div>
                 </div>
 
-                <div style={S.summaryCard}>
+                <div className="sales-summary-card" style={S.summaryCard}>
                   <div style={S.summaryLabel}>Valor restante</div>
 
                   <div
@@ -1429,6 +1443,7 @@ const DirectSalePage = () => {
                 </div>
 
                 <button
+                  className="sales-submit-button"
                   style={getSaveBtn(
                     saving ||
                     !isFormValid ||

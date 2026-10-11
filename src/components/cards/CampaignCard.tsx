@@ -1,6 +1,6 @@
 const CampaignCard = () => {
   return (
-    <div className="card create-campaign-card full-height">
+    <div className="card create-campaign-card full-height dashboard-card dashboard-actions-card">
       <h4 className="text-white">
         Acesse essas funcionalidades do sistema
       </h4>

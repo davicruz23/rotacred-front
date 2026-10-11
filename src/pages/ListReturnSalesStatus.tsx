@@ -235,18 +235,18 @@ const ListReturnSalesStatus = () => {
   }, [statusFilter]);
 
   return (
-    <div style={S.page}>
-      <div className="container-fluid px-1 my-1">
+    <div className="aftersales-page aftersales-list-page" style={S.page}>
+      <div className="container-fluid px-1 my-1 aftersales-page__inner">
         <BreadcrumbSection title="Lista de Ocorrências" link="/inicio" />
 
-        <div style={S.card}>
-          <div style={S.cardHead}>
+        <div className="aftersales-card" style={S.card}>
+          <div className="aftersales-card-head" style={S.cardHead}>
             <div style={S.cardTitle}>Lista de ocorrências</div>
           </div>
 
-          <div style={S.cardBody}>
+          <div className="aftersales-card-body" style={S.cardBody}>
             {/* ── Filtros ── */}
-            <div style={S.filters}>
+            <div className="aftersales-filters" style={S.filters}>
               <div style={S.field}>
                 <label style={S.label}>Status</label>
                 <select
@@ -292,6 +292,7 @@ const ListReturnSalesStatus = () => {
 
               <div style={S.field}>
                 <button
+                  className="aftersales-search-button"
                   style={S.searchBtn}
                   onClick={() => fetchReturns(statusFilter, 0)}
                 >
@@ -301,8 +302,8 @@ const ListReturnSalesStatus = () => {
             </div>
 
             {/* ── Tabela ── */}
-            <div style={{ overflowX: "auto" }}>
-              <table style={S.table}>
+            <div className="aftersales-table-scroll" style={{ overflowX: "auto" }}>
+              <table className="aftersales-table" style={S.table}>
                 <thead>
                   <tr>
                     <th style={S.th}>N° venda</th>
@@ -367,7 +368,7 @@ const ListReturnSalesStatus = () => {
             </div>
 
             {/* ── Paginação ── */}
-            <div style={S.footer}>
+            <div className="aftersales-pagination" style={S.footer}>
               <span style={S.pgInfo}>
                 Página {page + 1} de {totalPages || 1}
               </span>

@@ -141,27 +141,30 @@ const CreateUsersPage = () => {
   };
 
   return (
-    <div style={S.page}>
-      <div className="row g-4">
+    <div className="users-workspace users-create-page" style={S.page}>
+      <div className="row g-4 users-page-grid">
         <div className="col-12">
-          <div style={S.card}>
-            <div style={S.cardHead}>
-              <div style={S.cardTitle}>Novo usuário</div>
-              <div style={S.cardSub}>
+          <div className="users-card" style={S.card}>
+            <div className="users-card__head" style={S.cardHead}>
+              <div className="users-card-title" style={S.cardTitle}>Novo usuário</div>
+              <div className="users-card-subtitle" style={S.cardSub}>
                 Preencha os campos abaixo para cadastrar um novo usuário
               </div>
             </div>
 
-            <div style={S.cardBody}>
+            <div className="users-card__body" style={S.cardBody}>
               {message && (
-                <div style={isError ? S.alertError : S.alertSuccess}>
+                <div
+                  className={`users-feedback ${isError ? "users-feedback--error" : "users-feedback--success"}`}
+                  style={isError ? S.alertError : S.alertSuccess}
+                >
                   {message}
                 </div>
               )}
 
               <form onSubmit={handleSubmit}>
-                <div style={S.grid}>
-                  <div style={S.field}>
+                <div className="users-form-grid" style={S.grid}>
+                  <div className="users-field" style={S.field}>
                     <label style={S.label}>Nome</label>
                     <input
                       type="text"
@@ -173,7 +176,7 @@ const CreateUsersPage = () => {
                     />
                   </div>
 
-                  <div style={S.field}>
+                  <div className="users-field" style={S.field}>
                     <label style={S.label}>CPF</label>
                     <input
                       type="text"
@@ -185,7 +188,7 @@ const CreateUsersPage = () => {
                     />
                   </div>
 
-                  <div style={S.field}>
+                  <div className="users-field" style={S.field}>
                     <label style={S.label}>Senha</label>
                     <input
                       type="password"
@@ -197,7 +200,7 @@ const CreateUsersPage = () => {
                     />
                   </div>
 
-                  <div style={S.field}>
+                  <div className="users-field" style={S.field}>
                     <label style={S.label}>Função</label>
                     <select
                       style={S.select}
@@ -217,6 +220,7 @@ const CreateUsersPage = () => {
                 <hr style={S.divider} />
 
                 <button
+                  className="users-submit-button"
                   type="submit"
                   style={getSubmitBtnStyle(loading)}
                   disabled={loading}

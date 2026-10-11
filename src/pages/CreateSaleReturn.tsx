@@ -349,17 +349,17 @@ const CreateSaleReturn = () => {
     status !== "";
 
   return (
-    <div style={S.page}>
-      <div className="container-fluid px-2 px-md-3 my-2">
+    <div className="aftersales-page aftersales-create-page" style={S.page}>
+      <div className="container-fluid px-2 px-md-3 my-2 aftersales-page__inner">
         <BreadcrumbSection title="Registrar Ocorrência" link="/inicio" />
 
         {/* ── Busca ── */}
-        <div style={S.card}>
-          <div style={S.cardHead}>
+        <div className="aftersales-card" style={S.card}>
+          <div className="aftersales-card-head" style={S.cardHead}>
             <span style={S.cardTitle}>Buscar venda</span>
           </div>
-          <div style={S.cardBody}>
-            <div style={S.filters}>
+          <div className="aftersales-card-body" style={S.cardBody}>
+            <div className="aftersales-filters" style={S.filters}>
               <div style={S.field}>
                 <label style={S.label}>N° venda</label>
                 <input
@@ -393,7 +393,10 @@ const CreateSaleReturn = () => {
               <div style={S.field}>
                 <label style={S.label}>Cidade</label>
 
-                <div style={{ display: "flex", gap: 8 }}>
+                <div
+                  className="aftersales-inline-control"
+                  style={{ display: "flex", gap: 8 }}
+                >
                   <input
                     type="text"
                     style={{ ...S.input, flex: 1 }}
@@ -402,7 +405,11 @@ const CreateSaleReturn = () => {
                     placeholder="Digite a cidade"
                   />
 
-                  <button style={S.searchBtn} onClick={() => searchSales(0)}>
+                  <button
+                    className="aftersales-search-button aftersales-inline-search-button"
+                    style={S.searchBtn}
+                    onClick={() => searchSales(0)}
+                  >
                     Buscar
                   </button>
                 </div>
@@ -413,9 +420,9 @@ const CreateSaleReturn = () => {
 
         {/* ── Resultado ── */}
         {sales && (
-          <div style={S.card}>
-            <div style={{ overflowX: "auto" }}>
-              <table style={S.table}>
+          <div className="aftersales-card aftersales-results-card" style={S.card}>
+            <div className="aftersales-table-scroll" style={{ overflowX: "auto" }}>
+              <table className="aftersales-table" style={S.table}>
                 <thead>
                   <tr>
                     <th style={S.th}>ID</th>
@@ -515,11 +522,11 @@ const CreateSaleReturn = () => {
 
         {/* ── Detalhe da venda ── */}
         {selectedSale && (
-          <div style={S.card}>
-            <div style={S.cardHead}>
+          <div className="aftersales-card aftersales-detail-card" style={S.card}>
+            <div className="aftersales-card-head" style={S.cardHead}>
               <span style={S.cardTitle}>Venda #{selectedSale.saleId}</span>
             </div>
-            <div style={S.cardBody}>
+            <div className="aftersales-card-body" style={S.cardBody}>
               <div style={S.saleMeta}>
                 <div style={S.metaItem}>
                   <span style={S.metaLabel}>Cliente</span>
@@ -532,8 +539,8 @@ const CreateSaleReturn = () => {
               </div>
 
               <div style={S.sectionTitle}>Produtos da venda</div>
-              <div style={{ overflowX: "auto", marginBottom: 16 }}>
-                <table style={S.table}>
+              <div className="aftersales-table-scroll" style={{ overflowX: "auto", marginBottom: 16 }}>
+                <table className="aftersales-table" style={S.table}>
                   <thead>
                     <tr>
                       <th style={S.th}>Produto</th>

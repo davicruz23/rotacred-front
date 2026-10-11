@@ -332,20 +332,21 @@ const CommissionCollectorPage = () => {
   };
 
   return (
-    <div style={S.page}>
-      <div className="container-fluid px-1 my-1">
+    <div className="commission-page" style={S.page}>
+      <div className="container-fluid px-1 my-1 commission-page__inner">
         <BreadcrumbSection title="Comissão do Cobrador" link="/inicio" />
 
-        <div style={S.card}>
-          <div style={S.cardHead}>
+        <div className="commission-card" style={S.card}>
+          <div className="commission-card__header" style={S.cardHead}>
             <div style={S.cardTitle}>Calcular comissão</div>
           </div>
 
-          <div style={S.cardBody}>
-            <div style={S.grid}>
-              <div style={S.field}>
+          <div className="commission-card__body" style={S.cardBody}>
+            <div className="commission-form-grid" style={S.grid}>
+              <div className="commission-field" style={S.field}>
                 <label style={S.label}>Cobrador *</label>
                 <select
+                  className="commission-control"
                   style={S.select}
                   value={collectorId}
                   onChange={(e) =>
@@ -361,30 +362,33 @@ const CommissionCollectorPage = () => {
                 </select>
               </div>
 
-              <div style={S.field}>
+              <div className="commission-field" style={S.field}>
                 <label style={S.label}>Data inicial *</label>
                 <input
                   type="date"
+                  className="commission-control"
                   style={S.input}
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
               </div>
 
-              <div style={S.field}>
+              <div className="commission-field" style={S.field}>
                 <label style={S.label}>Data final *</label>
                 <input
                   type="date"
+                  className="commission-control"
                   style={S.input}
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </div>
 
-              <div style={S.field}>
+              <div className="commission-field" style={S.field}>
                 <label style={S.label}>Percentual da comissão (%)</label>
                 <input
                   type="number"
+                  className="commission-control"
                   style={S.input}
                   value={paymentPercentage}
                   min="1"
@@ -399,9 +403,10 @@ const CommissionCollectorPage = () => {
                 />
               </div>
 
-              <div style={S.field}>
+              <div className="commission-field" style={S.field}>
                 <label style={S.label}>Motivo da consulta *</label>
                 <select
+                  className="commission-control"
                   style={S.select}
                   value={reason}
                   onChange={(e) =>
@@ -433,6 +438,7 @@ const CommissionCollectorPage = () => {
             )}
 
             <button
+              className="commission-submit-button"
               style={getSubmitBtnStyle(loading)}
               disabled={loading}
               onClick={handleSearch}
@@ -519,7 +525,7 @@ const CommissionCollectorPage = () => {
                   )}
                 </div>
 
-                <div
+                <div className="commission-result"
                   style={{
                     ...S.highlightItem,
                     ...(isConsultationReason(response.reason)

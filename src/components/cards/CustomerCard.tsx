@@ -23,11 +23,18 @@ const CustomerCard = () => {
       .then((response) => {
         setSalesData(response.data);
       })
-      .catch((err: any) => {
-        console.error("Erro ao buscar dados de vendas:", err);
+      .catch((error: unknown) => {
+        console.error("Erro ao buscar dados de vendas:", error);
         setSalesData([]);
 
-        if (err?.response?.status === 404) {
+        const responseStatus =
+          typeof error === "object" &&
+          error !== null &&
+          "response" in error
+            ? (error as { response?: { status?: number } }).response?.status
+            : undefined;
+
+        if (responseStatus === 404) {
         navigate("/error-404", { replace: true });
         return;
       }
@@ -37,14 +44,14 @@ const CustomerCard = () => {
       return;
       })
       .finally(() => setLoading(false));
-  }, [selectedMonths]);
+  }, [navigate, selectedMonths]);
 
   const handleMonthChange = (months: number) => {
     setSelectedMonths(months);
   };
 
   return (
-    <div className="card pb-2 full-height">
+    <div className="card pb-2 full-height dashboard-card dashboard-sales-trend-card">
       <div className="new-old-customer-wrap d-flex align-items-center justify-content-between mb-4 flex-wrap row-gap-3">
         <h5 className="mb-0">Vendas por Mês</h5>
         <div className="d-flex align-items-center">

@@ -113,7 +113,7 @@ const SalesListPage = () => {
       setTotalElements(response.data.totalElements);
       setTotalPages(response.data.totalPages);
       setCurrentPage(response.data.number);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       alert("Erro ao carregar vendas.");
     } finally {
@@ -273,17 +273,19 @@ const SalesListPage = () => {
   };
 
   return (
-    <div className="row g-4">
+    <div className="row g-4 sales-workspace sales-list-page">
       <div className="col-12">
-        <div className="panel">
-          <div className="panel-body">
-            <div className="product-table-quantity">
+        <div className="panel sales-list-panel">
+          <div className="panel-body sales-list-panel-body">
+            <div className="product-table-quantity sales-list-hero">
               <ul>
-                <li className="text-white">Todas Vendas ({totalElements})</li>
+                <li className="text-white sales-list-hero-title">
+                  Todas Vendas ({totalElements})
+                </li>
               </ul>
             </div>
 
-            <div className="row g-2 mb-3">
+            <div className="row g-2 mb-3 sales-list-filters">
               <div className="col-md-2">
                 <select
                   className="form-select"
@@ -375,8 +377,8 @@ const SalesListPage = () => {
                 </div>
               </div>
             ) : (
-              <div className="table-responsive">
-                <table className="table table-bordered table-hover align-middle">
+              <div className="table-responsive sales-list-table-wrap">
+                <table className="table table-bordered table-hover align-middle sales-list-table">
                   <thead>
                     <tr>
                       <th>Nº VENDA</th>
@@ -420,7 +422,7 @@ const SalesListPage = () => {
                         </td>
 
                         <td>
-                          <div className="d-flex gap-2">
+                          <div className="d-flex gap-2 sales-list-actions">
                             {appliedUnpaidOnly && hasOpenInstallments(sale) && (
                               <button
                                 type="button"
@@ -467,9 +469,9 @@ const SalesListPage = () => {
         </div>
       </div>
       {showDateModal && (
-        <div className="modal fade show d-block" tabIndex={-1}>
+        <div className="modal fade show d-block sales-modal" tabIndex={-1}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
+            <div className="modal-content sales-modal__content">
               <div className="modal-header">
                 <h5 className="modal-title">
                   Alterar data da primeira parcela
@@ -529,9 +531,9 @@ const SalesListPage = () => {
       {showDateModal && <div className="modal-backdrop fade show" />}
 
       {showPaymentModal && paymentSaleInfo && (
-        <div className="modal fade show d-block" tabIndex={-1}>
+        <div className="modal fade show d-block sales-modal" tabIndex={-1}>
           <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content">
+            <div className="modal-content sales-modal__content">
               <div className="modal-header">
                 <h5 className="modal-title">
                   Registrar pagamento administrativo

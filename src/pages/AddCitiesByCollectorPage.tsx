@@ -103,17 +103,26 @@ const AddCitiesByCollectorPage = () => {
   };
 
   return (
-    <div className="container-fluid px-1 my-1">
+    <div className="container-fluid px-1 my-1 collector-cities-page">
       <BreadcrumbSection
         title="Atribuir Cobranças ao Cobrador"
         link="/inicio"
       />
 
-      <div className="card shadow-sm p-4 mb-4">
-        <h4 className="mb-3">Selecione o cobrador</h4>
+      <div className="card shadow-sm p-4 mb-4 collector-page-panel collector-assignment-panel">
+        <div className="collector-page-heading">
+          <div>
+            <span className="collector-page-eyebrow">DISTRIBUIÇÃO DE COBRANÇAS</span>
+            <h4 className="collector-page-title">Atribuir cidades ao cobrador</h4>
+            <p className="collector-page-subtitle">Escolha um responsável e selecione as vendas que serão direcionadas.</p>
+          </div>
+          <div className="collector-page-heading-icon" aria-hidden="true">
+            <i className="ti ti-map-pin" />
+          </div>
+        </div>
 
         <select
-          className="form-select w-25"
+          className="form-select w-25 collector-filter-select collector-assignment-select"
           value={selectedCollector}
           onChange={(e) => setSelectedCollector(e.target.value)}
         >
@@ -126,12 +135,12 @@ const AddCitiesByCollectorPage = () => {
         </select>
       </div>
 
-      <div className="accordion" id="accordionCities">
+      <div className="accordion collector-city-accordion" id="accordionCities">
         {groupedSales.map((group, index) => (
-          <div className="accordion-item" key={group.city}>
+          <div className="accordion-item collector-city-item" key={group.city}>
             <h2 className="accordion-header d-flex align-items-center">
               <button
-                className={`accordion-button ${openCity === group.city ? "" : "collapsed"}`}
+                className={`accordion-button collector-city-toggle ${openCity === group.city ? "" : "collapsed"}`}
                 type="button"
                 aria-expanded={openCity === group.city}
                 onClick={() => toggleCity(group.city)}
@@ -142,7 +151,7 @@ const AddCitiesByCollectorPage = () => {
                 </span>
               </button>
 
-              <div className="d-flex align-items-center gap-2 px-3">
+              <div className="d-flex align-items-center gap-2 px-3 collector-city-select-all">
                 <span className="small"></span>
 
                 <input
@@ -160,8 +169,8 @@ const AddCitiesByCollectorPage = () => {
               className="accordion-collapse"
               style={{ display: openCity === group.city ? "block" : "none" }}
             >
-              <div className="accordion-body">
-                <table className="table table-bordered">
+              <div className="accordion-body collector-city-body">
+                <table className="table table-bordered collector-city-table">
                   <thead>
                     <tr>
                       <th>Cliente</th>
@@ -203,8 +212,8 @@ const AddCitiesByCollectorPage = () => {
         ))}
       </div>
 
-      <div className="text-end mt-4">
-        <button className="btn btn-success px-4" onClick={handleAssign}>
+      <div className="text-end mt-4 collector-assignment-actions">
+        <button className="btn btn-success px-4 collector-assignment-button" onClick={handleAssign}>
           Atribuir Selecionadas
         </button>
       </div>

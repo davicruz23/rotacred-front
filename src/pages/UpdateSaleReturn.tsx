@@ -246,26 +246,30 @@ const UpdateSaleReturn = () => {
         delete updated[saleReturnId];
         return updated;
       });
-    } catch (error: any) {
-      console.error("Erro ao atualizar status:", error?.response?.data);
+    } catch (error: unknown) {
+      const responseData =
+        typeof error === "object" && error !== null && "response" in error
+          ? (error as { response?: { data?: unknown } }).response?.data
+          : error;
+      console.error("Erro ao atualizar status:", responseData);
     }
   };
 
   return (
-    <div style={S.page}>
-      <div className="container-fluid px-1 my-1">
+    <div className="aftersales-page aftersales-update-page" style={S.page}>
+      <div className="container-fluid px-1 my-1 aftersales-page__inner">
         <BreadcrumbSection
           title="Atualizar Status de Produtos em Garantia"
           link="/inicio"
         />
 
         {/* ── Filtros ── */}
-        <div style={S.card}>
-          <div style={S.cardHead}>
+        <div className="aftersales-card" style={S.card}>
+          <div className="aftersales-card-head" style={S.cardHead}>
             <span style={S.cardTitle}>Filtros</span>
           </div>
-          <div style={S.cardBody}>
-            <div style={S.filters}>
+          <div className="aftersales-card-body" style={S.cardBody}>
+            <div className="aftersales-filters" style={S.filters}>
               <div style={S.field}>
                 <label style={S.label}>N° venda</label>
                 <input
@@ -290,6 +294,7 @@ const UpdateSaleReturn = () => {
                 <label style={S.label}>CPF</label>
 
                 <div
+                  className="aftersales-inline-control"
                   style={{ display: "flex", gap: "8px", alignItems: "center" }}
                 >
                   <input
@@ -300,7 +305,11 @@ const UpdateSaleReturn = () => {
                     placeholder="000.000.000-00"
                   />
 
-                  <button style={S.searchBtn} onClick={fetchSales}>
+                  <button
+                    className="aftersales-search-button aftersales-inline-search-button"
+                    style={S.searchBtn}
+                    onClick={fetchSales}
+                  >
                     Buscar
                   </button>
                 </div>
@@ -310,12 +319,12 @@ const UpdateSaleReturn = () => {
         </div>
 
         {/* ── Lista ── */}
-        <div style={S.card}>
-          <div style={{ overflowX: "auto" }}>
+        <div className="aftersales-card aftersales-results-card" style={S.card}>
+          <div className="aftersales-table-scroll" style={{ overflowX: "auto" }}>
             {loading ? (
               <div style={S.loadingCell}>Carregando...</div>
             ) : (
-              <table style={S.table}>
+              <table className="aftersales-table" style={S.table}>
                 <thead>
                   <tr>
                     <th style={S.th}>N° venda</th>

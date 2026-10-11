@@ -629,11 +629,11 @@ function CollectorLocationPage() {
   };
 
   return (
-    <div style={S.page}>
+    <div className="collector-location-page" style={S.page}>
 
       {/* Cabeçalho */}
-      <div style={S.pageHead}>
-        <div style={S.pageIcon}>
+      <div className="collector-location-hero" style={S.pageHead}>
+        <div className="collector-location-hero-icon" style={S.pageIcon}>
           <i className="ti ti-route" />
         </div>
         <div>
@@ -642,22 +642,24 @@ function CollectorLocationPage() {
         </div>
       </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "end", gap: 12, marginBottom: 16 }}>
-        <label style={{ display: "flex", flexDirection: "column", gap: 5, fontSize: 12, fontWeight: 600, color: "#334155" }}>
+      <div className="collector-location-filters" style={{ display: "flex", flexWrap: "wrap", alignItems: "end", gap: 12, marginBottom: 16 }}>
+        <label className="collector-location-filter" style={{ display: "flex", flexDirection: "column", gap: 5, fontSize: 12, fontWeight: 600, color: "#334155" }}>
           Data inicial
           <input
             type="date"
             value={startDate}
             onChange={(event) => setStartDate(event.target.value)}
+            className="collector-location-date"
             style={{ border: "1px solid #94a3b8", borderRadius: 7, padding: "8px 10px", color: "#1f2937", backgroundColor: "#fff", fontSize: 13, fontWeight: 500, opacity: 1, WebkitTextFillColor: "#1f2937" }}
           />
         </label>
-        <label style={{ display: "flex", flexDirection: "column", gap: 5, fontSize: 12, fontWeight: 600, color: "#334155" }}>
+        <label className="collector-location-filter" style={{ display: "flex", flexDirection: "column", gap: 5, fontSize: 12, fontWeight: 600, color: "#334155" }}>
           Data final
           <input
             type="date"
             value={endDate}
             onChange={(event) => setEndDate(event.target.value)}
+            className="collector-location-date"
             style={{ border: "1px solid #94a3b8", borderRadius: 7, padding: "8px 10px", color: "#1f2937", backgroundColor: "#fff", fontSize: 13, fontWeight: 500, opacity: 1, WebkitTextFillColor: "#1f2937" }}
           />
         </label>
@@ -683,17 +685,18 @@ function CollectorLocationPage() {
         </div>
 
       ) : (
-        <div style={S.grid}>
+        <div className="collector-location-grid" style={S.grid}>
           {collectors.map((collector) => {
             const atividade = activityByCollector[collector.userId]?.points ?? [];
             const atividadeAberta = expandedCollectorId === collector.userId;
             const carregandoAtividade = loadingActivityCollectorId === collector.userId;
 
             return (
-              <div key={collector.collectorId} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div key={collector.collectorId} className="collector-location-card-wrap" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <button
               key={collector.collectorId}
               type="button"
+              className="collector-location-card"
               style={S.collCard}
               onClick={() => selecionarCollector(collector)}
               onMouseEnter={(e) => {
@@ -706,7 +709,7 @@ function CollectorLocationPage() {
               }}
             >
               {/* Topo */}
-              <div style={S.collCardTop}>
+              <div className="collector-location-card-top" style={S.collCardTop}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
                   <div style={S.collAvatar}>{getInitials(collector.collectorName)}</div>
                   <div style={{ minWidth: 0 }}>
@@ -718,7 +721,7 @@ function CollectorLocationPage() {
               </div>
 
               {/* Corpo */}
-              <div style={S.collBody}>
+              <div className="collector-location-card-body" style={S.collBody}>
                 <div style={S.infoRow}>
                   <i className="ti ti-calendar" style={S.infoIcon} />
                   <div>
@@ -738,16 +741,17 @@ function CollectorLocationPage() {
               </div>
 
               {/* Rodapé */}
-              <div style={S.collFooter}>
+              <div className="collector-location-card-footer" style={S.collFooter}>
                 <span>Acompanhar rota</span>
                 <i className="ti ti-chevron-right" />
               </div>
                 </button>
 
-                <div style={{ background: "#fff", border: "0.5px solid #e0e0e0", borderRadius: 10, overflow: "hidden" }}>
+                <div className="collector-location-activity" style={{ background: "#fff", border: "0.5px solid #e0e0e0", borderRadius: 10, overflow: "hidden" }}>
                   <button
                     type="button"
                     onClick={() => alternarAtividade(collector)}
+                    className="collector-location-activity-toggle"
                     style={{ width: "100%", border: "none", background: "#f8f9fa", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", color: "#185FA5", fontSize: 13, fontWeight: 600 }}
                   >
                     <span>
@@ -758,7 +762,7 @@ function CollectorLocationPage() {
                   </button>
 
                   {atividadeAberta && (
-                    <div style={{ padding: 10, borderTop: "0.5px solid #e0e0e0" }}>
+                    <div className="collector-location-activity-body" style={{ padding: 10, borderTop: "0.5px solid #e0e0e0" }}>
                       {carregandoAtividade ? (
                         <div style={{ padding: "12px 4px", textAlign: "center", color: "#888", fontSize: 12 }}>
                           <span className="spinner-border spinner-border-sm text-primary me-2" role="status" />
@@ -769,12 +773,13 @@ function CollectorLocationPage() {
                           Nenhuma cobrança no período selecionado.
                         </div>
                       ) : (
-                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <div className="collector-location-activity-list" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                           {atividade.map((ponto, index) => (
                             <button
                               key={getPontoKey(ponto, index)}
                               type="button"
                               onClick={() => abrirMapaComAtividade(collector, atividade)}
+                              className="collector-location-activity-item"
                               style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: 7, background: "#fff", padding: "8px 9px", display: "flex", alignItems: "center", gap: 8, textAlign: "left", cursor: "pointer" }}
                             >
                               <span style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", background: ponto.color === "GREEN" ? "#22c55e" : "#ef4444", color: "#fff", fontSize: 11, fontWeight: 700 }}>
@@ -807,11 +812,11 @@ function CollectorLocationPage() {
 
       {/* Modal */}
       {selectedCollector && (
-        <div style={S.overlay}>
-          <div style={S.modal} onClick={(e) => e.stopPropagation()}>
+        <div className="collector-location-overlay" style={S.overlay}>
+          <div className="collector-location-modal" style={S.modal} onClick={(e) => e.stopPropagation()}>
 
             {/* Cabeçalho do modal */}
-            <div style={S.modalHead}>
+            <div className="collector-location-modal-head" style={S.modalHead}>
               <div style={S.modalHeadLeft}>
                 <div style={S.modalIcon}>
                   <i className="ti ti-route" />
@@ -823,14 +828,14 @@ function CollectorLocationPage() {
                   </div>
                 </div>
               </div>
-              <button style={S.closeBtn} type="button" onClick={fecharMapa}>✕</button>
+              <button className="collector-location-close" style={S.closeBtn} type="button" onClick={fecharMapa}>✕</button>
             </div>
 
             {/* Corpo do modal */}
-            <div style={S.modalBody}>
+            <div className="collector-location-modal-body" style={S.modalBody}>
 
               {/* Mapa */}
-              <div style={S.mapArea}>
+              <div className="collector-location-map" style={S.mapArea}>
                 {loadingRoute ? (
                   <div style={{ ...S.spinnerWrap, minHeight: 420 }}>
                     <div className="spinner-border text-primary" role="status">
@@ -930,7 +935,7 @@ function CollectorLocationPage() {
               </div>
 
               {/* Sidebar */}
-              <aside style={S.sidebar}>
+              <aside className="collector-location-sidebar" style={S.sidebar}>
                 <div style={S.sideItem}>
                   <div style={S.sideLabel}>Cobrador</div>
                   <div style={S.sideValue}>{selectedCollector.collectorName}</div>
@@ -964,6 +969,7 @@ function CollectorLocationPage() {
 
                 <button
                   type="button"
+                  className="collector-location-refresh"
                   style={loadingRoute ? S.refreshBtnDisabled : S.refreshBtn}
                   disabled={loadingRoute}
                   onClick={() => void buscarRota(selectedCollector)}

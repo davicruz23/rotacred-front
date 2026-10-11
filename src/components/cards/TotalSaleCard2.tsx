@@ -18,7 +18,7 @@ const TotalSaleCard2 = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) return <div className="dashboard-kpi-skeleton">Carregando...</div>;
 
   const valorFormatado = data
     ? data.totalSale.toLocaleString("pt-BR", {
@@ -31,7 +31,7 @@ const TotalSaleCard2 = () => {
   const isPositive = percentual >= 0;
 
   return (
-    <div className="card saas-cta-card">
+    <div className="card saas-cta-card dashboard-kpi-card dashboard-kpi-card--sales">
       <div className="d-flex align-items-center">
         <div className="icon-wrap">
           <i className="ti ti-basket"></i>

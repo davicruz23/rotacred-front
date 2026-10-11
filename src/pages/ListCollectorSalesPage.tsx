@@ -392,18 +392,27 @@ const ListCollectorSalesPage = () => {
   };
 
   return (
-    <div className="container-fluid px-1 my-1">
+    <div className="container-fluid px-1 my-1 collectors-sales-page">
       <BreadcrumbSection title="Lista de venda para cobrança" link="/inicio" />
 
-      <div className="card p-4 shadow-sm">
-        <h3 className="mb-4">Lista de cobranças</h3>
+      <div className="card p-4 shadow-sm collector-page-panel">
+        <div className="collector-page-heading">
+          <div>
+            <span className="collector-page-eyebrow">OPERAÇÃO DE COBRANÇA</span>
+            <h3 className="collector-page-title">Lista de cobranças</h3>
+            <p className="collector-page-subtitle">Acompanhe vendas, parcelas e localizações atribuídas aos cobradores.</p>
+          </div>
+          <div className="collector-page-heading-icon" aria-hidden="true">
+            <i className="ti ti-cash" />
+          </div>
+        </div>
 
         {/* ── Filtros ── */}
-        <div className="row mb-4">
+        <div className="row mb-4 collector-filters">
           <div className="col-md-4">
-            <label className="form-label fw-semibold">Vendas por status</label>
+            <label className="form-label fw-semibold collector-filter-label">Vendas por status</label>
             <select
-              className="form-select"
+              className="form-select collector-filter-select"
               value={statusFilter}
               onChange={(e) => setStatusFilter(Number(e.target.value))}
             >
@@ -415,11 +424,11 @@ const ListCollectorSalesPage = () => {
           </div>
 
           <div className="col-md-4">
-            <label className="form-label fw-semibold">
+            <label className="form-label fw-semibold collector-filter-label">
               Vendas por cobrador
             </label>
             <select
-              className="form-select"
+              className="form-select collector-filter-select"
               value={collectorFilter ?? ""}
               onChange={(e) =>
                 setCollectorFilter(
@@ -437,11 +446,11 @@ const ListCollectorSalesPage = () => {
           </div>
 
           <div className="col-md-4">
-            <label className="form-label fw-semibold">
+            <label className="form-label fw-semibold collector-filter-label">
               Vendas Ativas/Finalizadas
             </label>
             <select
-              className="form-select"
+              className="form-select collector-filter-select"
               value={paymentFilter}
               onChange={(e) =>
                 setPaymentFilter(e.target.value as PaymentFilterType)
@@ -455,14 +464,17 @@ const ListCollectorSalesPage = () => {
         </div>
 
         {/* ── Lista de cobradores ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+        <div className="collector-groups" style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {collectorData.map((collector, collIdx) => {
             const isCollOpen = openCollectors.has(collector.id);
 
             return (
-              <div key={collector.id} style={S.collCard}>
+              <div key={collector.id} className="collector-group-card" style={S.collCard}>
                 {/* Cabeçalho do cobrador */}
                 <button
+                  className="collector-group-toggle"
+                  type="button"
+                  aria-expanded={isCollOpen}
                   style={{
                     ...S.collHeader,
                     background: isCollOpen ? "var(--rtc-panel-bg, #f8f9fa)" : "var(--rtc-card-bg, #fff)",
@@ -507,7 +519,7 @@ const ListCollectorSalesPage = () => {
 
                 {/* Corpo do cobrador */}
                 {isCollOpen && (
-                  <div style={S.collBody}>
+                  <div className="collector-group-body" style={S.collBody}>
                     {collector.sales.length === 0 && (
                       <p style={{ color: "var(--rtc-soft-muted, #aaa)", fontSize: 13 }}>
                         Nenhuma venda encontrada.
@@ -521,9 +533,12 @@ const ListCollectorSalesPage = () => {
                       const isSaleOpen = openSales.has(sale.id);
 
                       return (
-                        <div key={sale.id} style={S.saleCard}>
+                        <div key={sale.id} className="collector-sale-card" style={S.saleCard}>
                           {/* Cabeçalho da venda */}
                           <button
+                            className="collector-sale-toggle"
+                            type="button"
+                            aria-expanded={isSaleOpen}
                             style={S.saleHeader(isReadOnlySale)}
                             onClick={() => toggleSale(sale.id)}
                           >
@@ -555,10 +570,10 @@ const ListCollectorSalesPage = () => {
 
                           {/* Corpo da venda */}
                           {isSaleOpen && (
-                            <div style={S.saleBody}>
+                            <div className="collector-sale-body" style={S.saleBody}>
                               {/* Info grid */}
-                              <div style={S.infoGrid}>
-                                <div style={S.infoItem}>
+                              <div className="collector-sale-summary" style={S.infoGrid}>
+                                <div className="collector-sale-stat" style={S.infoItem}>
                                   <div
                                     style={{
                                       fontSize: 11,
@@ -574,7 +589,7 @@ const ListCollectorSalesPage = () => {
                                     {sale.saleDate}
                                   </div>
                                 </div>
-                                <div style={S.infoItem}>
+                                <div className="collector-sale-stat" style={S.infoItem}>
                                   <div
                                     style={{
                                       fontSize: 11,
@@ -590,7 +605,7 @@ const ListCollectorSalesPage = () => {
                                     {sale.paymentType}
                                   </div>
                                 </div>
-                                <div style={S.infoItem}>
+                                <div className="collector-sale-stat" style={S.infoItem}>
                                   <div
                                     style={{
                                       fontSize: 11,
@@ -606,7 +621,7 @@ const ListCollectorSalesPage = () => {
                                     {sale.nparcel}x
                                   </div>
                                 </div>
-                                <div style={S.infoItem}>
+                                <div className="collector-sale-stat" style={S.infoItem}>
                                   <div
                                     style={{
                                       fontSize: 11,
@@ -627,6 +642,7 @@ const ListCollectorSalesPage = () => {
                               {/* Botão mapa da venda */}
                               {sale.latitude && sale.longitude && (
                                 <button
+                                  className="collector-map-button"
                                   style={S.mapBtn(isReadOnlySale)}
                                   disabled={isReadOnlySale}
                                   title={
@@ -644,9 +660,9 @@ const ListCollectorSalesPage = () => {
                               )}
 
                               {/* Produtos */}
-                              <div style={S.sectionTitle}>Produtos</div>
+                              <div className="collector-section-title" style={S.sectionTitle}>Produtos</div>
                               {sale.products.map((p) => (
-                                <div key={p.id} style={S.productItem}>
+                                <div key={p.id} className="collector-product-item" style={S.productItem}>
                                   <span>
                                     <span
                                       style={{ color: "var(--rtc-muted, #888)", fontSize: 12 }}
@@ -676,6 +692,7 @@ const ListCollectorSalesPage = () => {
                                     {sale.saleReturns.map((s) => (
                                       <div
                                         key={s.saleReturnId}
+                                        className="collector-return-item"
                                         style={S.returnItem}
                                       >
                                         <div>
@@ -715,8 +732,8 @@ const ListCollectorSalesPage = () => {
                                 )}
 
                               {/* Parcelas */}
-                              <div style={S.sectionTitle}>Parcelas</div>
-                              <div style={{ overflowX: "auto" }}>
+                              <div className="collector-section-title" style={S.sectionTitle}>Parcelas</div>
+                              <div className="collector-installments-scroll" style={{ overflowX: "auto" }}>
                                 <table style={S.table}>
                                   <thead>
                                     <tr>
